@@ -1,0 +1,48 @@
+# Central monitoring for every GrepX project:   scripts/run.sh monitor   |   scripts/run.sh monitor down
+#   Prometheus   scrapes every service's /metrics (targets from scripts/run.sh targets)
+#   Promtail     tails ../logs/*.log (JSON lines: service, project, level, trace_id) into Loki
+#   Loki         stores the logs (light: ~100 MB of memory)
+#   Grafana      http://<server>:3000  (admin / GRAFANA_PASSWORD from .env) - "GrepX services" dashboard:
+#                filter by project / service / level, paste a trace id to follow one request through every service
+# Only Grafana is reachable from outside; Prometheus and Loki listen on this machine only.
+# Prometheus and Grafana use the host network: the services' metrics ports listen on 127.0.0.1 (not public).
+name: grepx-observability
+services:
+  loki:
+    image: grafana/loki:3.2.1
+    command: -config.file=/etc/loki/local-config.yaml
+    ports: ["127.0.0.1:${LOKI_PORT:-3100}:3100"]
+    volumes: ["loki-data:/loki"]
+  promtail:
+    image: grafana/promtail:3.2.1
+    depends_on: [loki]
+    command: -config.file=/etc/promtail/promtail.yml
+    volumes:
+      - ./promtail/promtail.yml:/etc/promtail/promtail.yml:ro
+      - ../logs:/grepx/logs:ro
+      - promtail-data:/promtail
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    network_mode: host
+    command: ["--config.file=/etc/prometheus/prometheus.yml", "--storage.tsdb.path=/prometheus",
+              "--web.listen-address=127.0.0.1:${PROMETHEUS_PORT:-9090}"]
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/targets.json:/etc/prometheus/targets.json:ro
+  grafana:
+    image: grafana/grafana:11.2.2
+    depends_on: [prometheus, loki]
+    network_mode: host
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+      - GF_INSTALL_PLUGINS=
+      - GF_SERVER_HTTP_ADDR=${GRAFANA_BIND:-0.0.0.0}
+      - GF_SERVER_HTTP_PORT=3000
+      - PROMETHEUS_PORT=${PROMETHEUS_PORT:-9090}
+      - LOKI_PORT=${LOKI_PORT:-3100}
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+volumes:
+  loki-data:
+  promtail-data:

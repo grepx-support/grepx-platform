@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "grepx-config"
+version = "0.1.0"
+description = "grepx_config - where settings come from, in one place (no other GrepX dependency)."
+requires-python = ">=3.10"
+# GrepX libraries listed here are checked against the imports by platform/tools/test/test_deps.py
+dependencies = [
+    "pyyaml>=6",
+]
+
+[tool.setuptools.packages.find]
+include = ["grepx_config*"]

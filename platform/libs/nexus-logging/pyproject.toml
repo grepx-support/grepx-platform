@@ -1,0 +1,14 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nexus-logging"
+version = "0.1.0"
+description = "Logging setup, standalone - no nexus_api dependency, usable anywhere."
+requires-python = ">=3.10"
+# GrepX libraries listed here are checked against the imports by platform/tools/test/test_deps.py
+dependencies = []
+
+[tool.setuptools.packages.find]
+include = ["nexus_logging*"]

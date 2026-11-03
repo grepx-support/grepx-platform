@@ -1,0 +1,14 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "grepx-contracts"
+version = "0.1.0"
+description = "Every service's published names: service, request table, owned tables, actions, fields, reason codes (generated)."
+requires-python = ">=3.10"
+# GrepX libraries listed here are checked against the imports by platform/tools/test/test_deps.py
+dependencies = []
+
+[tool.setuptools.packages.find]
+include = ["grepx_contracts*"]

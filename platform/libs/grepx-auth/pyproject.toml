@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "grepx-auth"
+version = "0.1.0"
+description = "grepx_auth — token, password and secret-transport primitives shared by auth-service and every BFF."
+requires-python = ">=3.10"
+# GrepX libraries listed here are checked against the imports by platform/tools/test/test_deps.py
+dependencies = [
+    "pyjwt>=2.8",
+    "cryptography>=41",
+]
+
+[tool.setuptools.packages.find]
+include = ["grepx_auth*"]

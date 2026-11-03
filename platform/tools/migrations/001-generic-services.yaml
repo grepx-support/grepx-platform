@@ -1,0 +1,44 @@
+# Phase 4: blood-only services became generic common services. Run once, with every service stopped:
+#   scripts/run.sh stop && scripts/run.sh backup && scripts/run.sh migrate 001-generic-services && scripts/run.sh start
+# Rewrites the Nexus database (nexus_rows + outbox). Service databases are projections and refill from Nexus on start.
+services:          # old service name -> new (to_service / from_service / target_service / any exact value)
+  drive-service: event-service
+  registration-service: booking-service
+  rewards-service: recognition-service
+  report-service: event-report-service
+  outreach-service: campaign-service
+  eligibility-service: questionnaire-service
+tables:            # old table name -> new
+  drives: events
+  drive_requests: event_requests
+  registrations: bookings
+  registration_requests: booking_requests
+  drive_reports: event_reports
+  report_requests: event_report_requests
+  reward_requests: recognition_requests
+  eligibility_checks: questionnaire_requests
+fields:            # renamed in every table listed under `in` (new table names)
+  in: [events, event_requests, bookings, booking_requests, slots, slot_requests, certificates, vouchers, recognition_requests,
+       referral_scores, referral_events, event_reports, event_report_requests, campaigns, campaign_requests, social_posts]
+  rename: {source_drive_id: source_event_id, drive_id: event_id, drive_date: event_date, drive_title: event_title,
+           registration_id: booking_id, donor_id: person_id, donor_ids: person_ids}
+table_fields:      # renames for one table only
+  certificates: {donated_on: attended_on}
+  referral_scores: {donated: converted}
+values:            # table -> field -> {old value: new}
+  bookings: {state: {donated: attended}}
+  booking_requests: {state: {donated: attended}}
+  tasks: {ref_type: {drive: event}}
+  schedules: {job: {drive-reminders: event-reminders}, schedule_id: {drive-reminders: event-reminders}}
+  schedule_requests: {job: {drive-reminders: event-reminders}, schedule_id: {drive-reminders: event-reminders}}
+keys:              # table -> {old row key: new}
+  schedules: {drive-reminders: event-reminders}
+json_keys:         # table -> field holding JSON -> {old key: new}
+  event_reports: {stats: {donated: attended, drive: event}}
+  notifications: {values: {drive_title: event_title, drive_date: event_date, drive_time: event_time}}
+text:              # table -> {old text: new} replaced inside every string value (message placeholders)
+  templates: {"{drive_title}": "{event_title}", "{drive_date}": "{event_date}", "{drive_time}": "{event_time}",
+              '"drive_title"': '"event_title"', '"drive_date"': '"event_date"', '"drive_time"': '"event_time"'}
+  message_templates: {"{drive_title}": "{event_title}", "{drive_date}": "{event_date}", "{drive_time}": "{event_time}",
+                      '"drive_title"': '"event_title"', '"drive_date"': '"event_date"', '"drive_time"': '"event_time"'}
+drop_tables: [_health]   # heartbeats under the old service names; services write fresh ones on start

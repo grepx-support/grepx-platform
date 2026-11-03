@@ -1,0 +1,298 @@
+{
+ "uid": "grepx-services",
+ "title": "GrepX services",
+ "schemaVersion": 39,
+ "time": {
+  "from": "now-6h",
+  "to": "now"
+ },
+ "refresh": "30s",
+ "panels": [
+  {
+   "id": 1,
+   "type": "stat",
+   "title": "Services up",
+   "datasource": {
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 0,
+    "w": 6,
+    "h": 4
+   },
+   "targets": [
+    {
+     "expr": "sum(up{job=\"grepx-services\",project=~\"$project\",service=~\"$service\"})",
+     "refId": "A"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "type": "stat",
+   "title": "Services down",
+   "datasource": {
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 6,
+    "y": 0,
+    "w": 6,
+    "h": 4
+   },
+   "fieldConfig": {
+    "defaults": {
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "green",
+        "value": null
+       },
+       {
+        "color": "red",
+        "value": 1
+       }
+      ]
+     }
+    }
+   },
+   "targets": [
+    {
+     "expr": "count(up{job=\"grepx-services\",project=~\"$project\",service=~\"$service\"} == 0) or vector(0)",
+     "refId": "A"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "type": "stat",
+   "title": "Errors (1h)",
+   "datasource": {
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 12,
+    "y": 0,
+    "w": 6,
+    "h": 4
+   },
+   "targets": [
+    {
+     "expr": "sum(increase(grepx_requests_errors_total{project=~\"$project\",service=~\"$service\"}[1h]))",
+     "refId": "A"
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "type": "stat",
+   "title": "Rejected (1h)",
+   "datasource": {
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 18,
+    "y": 0,
+    "w": 6,
+    "h": 4
+   },
+   "targets": [
+    {
+     "expr": "sum(increase(grepx_requests_rejected_total{project=~\"$project\",service=~\"$service\"}[1h]))",
+     "refId": "A"
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "type": "table",
+   "title": "Service status",
+   "datasource": {
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 4,
+    "w": 24,
+    "h": 8
+   },
+   "targets": [
+    {
+     "expr": "up{job=\"grepx-services\",project=~\"$project\",service=~\"$service\"}",
+     "format": "table",
+     "instant": true,
+     "refId": "A"
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "type": "timeseries",
+   "title": "Requests handled / min",
+   "datasource": {
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 12,
+    "w": 12,
+    "h": 8
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short"
+    }
+   },
+   "targets": [
+    {
+     "expr": "sum by (service) (rate(grepx_requests_handled_total{project=~\"$project\",service=~\"$service\"}[5m])) * 60",
+     "legendFormat": "{{service}}",
+     "refId": "A"
+    }
+   ]
+  },
+  {
+   "id": 7,
+   "type": "timeseries",
+   "title": "Rejected / min (business rule said no)",
+   "datasource": {
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 12,
+    "y": 12,
+    "w": 12,
+    "h": 8
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short"
+    }
+   },
+   "targets": [
+    {
+     "expr": "sum by (service) (rate(grepx_requests_rejected_total{project=~\"$project\",service=~\"$service\"}[5m])) * 60",
+     "legendFormat": "{{service}}",
+     "refId": "A"
+    }
+   ]
+  },
+  {
+   "id": 8,
+   "type": "timeseries",
+   "title": "Crashes / min (dead letters)",
+   "datasource": {
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 20,
+    "w": 24,
+    "h": 8
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short"
+    }
+   },
+   "targets": [
+    {
+     "expr": "sum by (service) (rate(grepx_requests_errors_total{project=~\"$project\",service=~\"$service\"}[5m])) * 60",
+     "legendFormat": "{{service}}",
+     "refId": "A"
+    }
+   ]
+  },
+  {
+   "id": 9,
+   "type": "logs",
+   "title": "Logs (paste a trace id above to follow one request through every service)",
+   "datasource": {
+    "type": "loki",
+    "uid": "logs"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 28,
+    "w": 24,
+    "h": 14
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "loki",
+      "uid": "logs"
+     },
+     "expr": "{job=\"grepx\", project=~\"$project\", service=~\"$service\", level=~\"$level\"} |= \"$trace\""
+    }
+   ],
+   "options": {
+    "showTime": true,
+    "wrapLogMessage": true,
+    "sortOrder": "Descending"
+   }
+  }
+ ],
+ "templating": {
+  "list": [
+   {
+    "name": "project",
+    "type": "query",
+    "datasource": {
+     "uid": "prometheus"
+    },
+    "query": "label_values(up{job=\"grepx-services\"}, project)",
+    "includeAll": true,
+    "multi": true,
+    "current": {
+     "text": "All",
+     "value": "$__all"
+    },
+    "refresh": 2,
+    "allValue": ".*"
+   },
+   {
+    "name": "service",
+    "type": "query",
+    "datasource": {
+     "uid": "prometheus"
+    },
+    "query": "label_values(up{job=\"grepx-services\",project=~\"$project\"}, service)",
+    "includeAll": true,
+    "multi": true,
+    "current": {
+     "text": "All",
+     "value": "$__all"
+    },
+    "refresh": 2,
+    "allValue": ".*"
+   },
+   {
+    "name": "level",
+    "type": "custom",
+    "query": "INFO,WARNING,ERROR,TEXT",
+    "current": {
+     "text": "All",
+     "value": "$__all"
+    },
+    "includeAll": true,
+    "multi": true,
+    "allValue": ".*"
+   },
+   {
+    "name": "trace",
+    "label": "trace id",
+    "type": "textbox",
+    "query": "",
+    "current": {
+     "text": "",
+     "value": ""
+    },
+    "description": "paste an X-Trace-Id (from an error message or the logs) to see only that request"
+   }
+  ]
+ }
+}

@@ -1,0 +1,35 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.venv*/
+.env
+.env.*
+!.env.example
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.sqlite
+*.sqlite3
+*.db
+*.log
+data/
+logs/
+run/
+node_modules/
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+_to_delete/
+
+# Generated at setup (scripts/run.sh contracts) from the services of the workspace that uses this platform
+platform/libs/grepx-contracts/grepx_contracts/*
+!platform/libs/grepx-contracts/grepx_contracts/.gitkeep
+# The Nexus binary comes from grepx-nexus-cpp (./workspace.sh in the product repo links it)
+platform/nexus-server/bin/*
+!platform/nexus-server/bin/.gitkeep

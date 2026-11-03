@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "grepx-audit"
+version = "0.1.0"
+description = "Shared helper: write an audit_log row from any backend service."
+requires-python = ">=3.10"
+# GrepX libraries listed here are checked against the imports by platform/tools/test/test_deps.py
+dependencies = [
+    "grepx-contracts",
+    "nexus-client",
+]
+
+[tool.setuptools.packages.find]
+include = ["grepx_audit*"]

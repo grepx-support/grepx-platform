@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "grepx-web-bootstrap"
+version = "0.1.0"
+description = "Framework-agnostic web server bootstrap (Flask/FastAPI/Django) with automatic port allocation"
+requires-python = ">=3.10"
+# GrepX libraries listed here are checked against the imports by platform/tools/test/test_deps.py
+dependencies = [
+    "grepx-port-provider",
+]
+
+[project.optional-dependencies]
+fastapi = ["fastapi", "uvicorn"]
+flask = ["flask"]
+
+[tool.setuptools.packages.find]
+include = ["grepx_web_bootstrap*"]

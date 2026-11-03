@@ -1,0 +1,6 @@
+venv_grepx_nexus_client/
+__pycache__/
+*.pyc
+*.egg-info/
+build/
+dist/

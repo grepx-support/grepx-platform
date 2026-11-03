@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nexus-testkit"
+version = "0.1.0"
+description = "nexus_testkit - an in-memory stand-in for the Nexus hub, for unit tests only."
+requires-python = ">=3.10"
+# GrepX libraries listed here are checked against the imports by platform/tools/test/test_deps.py
+dependencies = [
+    "nexus-client",
+]
+
+[tool.setuptools.packages.find]
+include = ["nexus_testkit*"]

@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "grepx-service"
+version = "0.1.0"
+description = "grepx_service — the shared service kit every GrepX service is built on."
+requires-python = ">=3.10"
+# GrepX libraries listed here are checked against the imports by platform/tools/test/test_deps.py
+dependencies = [
+    "grepx-config",
+    "grepx-contracts",
+    "grepx-store",
+    "grepx-web-bootstrap",
+    "nexus-client",
+    "nexus-logging",
+    "pyyaml>=6",
+]
+
+[tool.setuptools.packages.find]
+include = ["grepx_service*"]

@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "grepx-storage"
+version = "0.1.0"
+description = "grepx_storage — blob storage strategy (local disk or S3-compatible), shared by BFFs and media-service."
+requires-python = ">=3.10"
+# GrepX libraries listed here are checked against the imports by platform/tools/test/test_deps.py
+dependencies = [
+    "grepx-config",
+]
+
+[project.optional-dependencies]
+s3 = ["boto3>=1.34"]
+
+[tool.setuptools.packages.find]
+include = ["grepx_storage*"]

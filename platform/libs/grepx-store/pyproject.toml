@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "grepx-store"
+version = "0.1.0"
+description = "grepx_store - a service's private database, chosen by configuration, not code."
+requires-python = ">=3.10"
+# GrepX libraries listed here are checked against the imports by platform/tools/test/test_deps.py
+dependencies = [
+    "grepx-config",
+    "pyyaml>=6",
+]
+
+[project.optional-dependencies]
+postgres = ["psycopg[binary]>=3.1"]
+mongo = ["pymongo>=4.6"]
+
+[tool.setuptools.packages.find]
+include = ["grepx_store*"]

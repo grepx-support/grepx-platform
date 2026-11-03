@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "grepx-testkit"
+version = "0.1.0"
+description = "grepx_testkit - test one service (ServiceHarness) or the whole stack (start_stack) on an in-memory Nexus."
+requires-python = ">=3.10"
+# GrepX libraries listed here are checked against the imports by platform/tools/test/test_deps.py
+dependencies = [
+    "grepx-config",
+    "grepx-service",
+    "nexus-client",
+    "nexus-testkit",
+]
+
+[tool.setuptools.packages.find]
+include = ["grepx_testkit*"]

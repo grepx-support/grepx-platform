@@ -1,0 +1,7 @@
+global:
+  scrape_interval: 15s
+scrape_configs:
+  - job_name: grepx-services
+    file_sd_configs:
+      - files: [/etc/prometheus/targets.json]
+        refresh_interval: 30s

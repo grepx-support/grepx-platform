@@ -1,0 +1,21 @@
+# Tail every service's log (one JSON object per line) into Loki.
+# Labels (few values, cheap to filter): project, service, level. The trace id stays in the line: search it with |= "<id>".
+server:
+  http_listen_port: 9080
+positions:
+  filename: /promtail/positions.yaml
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+scrape_configs:
+  - job_name: grepx
+    static_configs:
+      - targets: [localhost]
+        labels: {job: grepx, __path__: /grepx/logs/*.log}
+    pipeline_stages:
+      - regex: {source: filename, expression: '/grepx/logs/(?P<file>[^/]+)\.log$'}
+      - json: {expressions: {service: service, project: project, level: level, ts: ts}}
+      - template: {source: service, template: '{{ or .service .file "unknown" }}'}   # plain-text logs (nexus-server): the file name
+      - template: {source: project, template: '{{ or .project "platform" }}'}
+      - template: {source: level, template: '{{ or .level "TEXT" }}'}
+      - labels: {service: "", project: "", level: ""}
+      - timestamp: {source: ts, format: RFC3339Nano, action_on_failure: skip}

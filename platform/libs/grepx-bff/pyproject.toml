@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "grepx-bff"
+version = "0.1.0"
+description = "grepx_bff — everything a product BFF shares: gateway, auth, errors, tracing, common routers, app factory."
+requires-python = ">=3.10"
+# GrepX libraries listed here are checked against the imports by platform/tools/test/test_deps.py
+dependencies = [
+    "grepx-auth",
+    "grepx-common",
+    "grepx-config",
+    "grepx-contracts",
+    "grepx-service",
+    "grepx-storage",
+    "grepx-web-bootstrap",
+    "nexus-client",
+    "fastapi>=0.110",
+    "python-multipart>=0.0.9",
+]
+
+[tool.setuptools.packages.find]
+include = ["grepx_bff*"]

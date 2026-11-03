@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "grepx-port-provider"
+version = "0.1.0"
+description = "Port range registry for grepx-kitchen-stock-flow's services"
+requires-python = ">=3.10"
+# GrepX libraries listed here are checked against the imports by platform/tools/test/test_deps.py
+dependencies = [
+    "grepx-config",
+]
+
+[tool.setuptools.packages.find]
+include = ["grepx_port_provider*"]
