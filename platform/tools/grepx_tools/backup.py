@@ -1,3 +1,7 @@
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 """Backups for the whole platform: every service's own database, the Nexus database and the uploaded pictures.
 
     scripts/run.sh backup                 copy everything into BACKUP_DIR, commit, and push when BACKUP_GIT_REMOTE is set

@@ -1,3 +1,7 @@
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 """scripts/run.sh seed [project] - load each product's catalogue into the common services (idempotent).
 
 A product declares its catalogue folder in config/projects/<product>.yaml:   catalog: product-services/<product>/catalog

@@ -1,3 +1,7 @@
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 """Durable snapshot store: nexus_rows (latest row per key) + outbox (every transition).
 
 SQLite on disk with an in-memory mirror for fast criteria scans. Field text is

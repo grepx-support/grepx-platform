@@ -1,3 +1,7 @@
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 """Distributed tracing over Nexus - one id from the browser click to the last side effect.
 
 Every row carries trace_id (same for the whole request), parent (the row that caused it)

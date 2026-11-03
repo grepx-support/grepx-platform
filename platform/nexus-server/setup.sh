@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 # Set up the Nexus hub (the C++ nexus_server binary - copy it yourself into platform/nexus-server/bin/).
 # Prepares bin/nexus_data.db: the server's schema + the Nexus user from NEXUS_USERNAME / NEXUS_PASSWORD (.env).
 #   ./setup.sh | ./setup.sh reset   (reset deletes bin/nexus_data.db first)

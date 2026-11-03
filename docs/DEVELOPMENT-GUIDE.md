@@ -1,3 +1,9 @@
+<!--
+  Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+  This file is part of the GrepX platform and is proprietary and confidential.
+  Unauthorised copying, use, modification or distribution is strictly prohibited.
+-->
+
 # Development guide — how to turn a requirement into services
 
 Written for whoever (human or AI) picks up the next requirement. Follow the steps in order.

@@ -1,3 +1,7 @@
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 """Infrastructure from configuration: which database engines the services use, and starting them.
 
     python platform/tools/grepx_tools/infra.py plan     # service -> engine table

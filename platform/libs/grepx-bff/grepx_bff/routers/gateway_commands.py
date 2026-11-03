@@ -1,3 +1,7 @@
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 """Generic API gateway: any catalogued service's action over HTTP, for admins and integrations.
 
 POST /api/v1/gateway/{service}/{action} with a JSON body → the request row → the verdict.

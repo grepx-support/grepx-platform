@@ -1,3 +1,7 @@
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 """grepx_store - a service's private database, chosen by configuration, not code.
 
     store = open_store(database_url(cfg))      # sqlite:///... | postgresql://... | mongodb://... | memory://

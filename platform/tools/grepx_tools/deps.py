@@ -1,3 +1,7 @@
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 """scripts/run.sh deps - write each service's requirements.txt and each library's pyproject dependencies from what
 the code imports (platform libraries, with everything they need in turn); fail on an import cycle between libraries.
 

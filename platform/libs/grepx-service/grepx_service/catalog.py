@@ -1,3 +1,7 @@
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 """Seed the common services with a product's catalogue folder (idempotent: every request has a stable key).
 
 A product keeps plain YAML in its catalogue folder (declared as `catalog:` in config/projects/<product>.yaml):

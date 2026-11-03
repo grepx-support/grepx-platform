@@ -1,3 +1,9 @@
+<!--
+  Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+  This file is part of the GrepX platform and is proprietary and confidential.
+  Unauthorised copying, use, modification or distribution is strictly prohibited.
+-->
+
 # GrepX Platform — Architecture (blood donation is product #1)
 
 > This repository is the **GrepX core platform** with its first product (LifeFlow Blood Camp) built on it.

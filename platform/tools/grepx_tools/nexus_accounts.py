@@ -1,3 +1,7 @@
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 """One Nexus login per service, and which tables each one may write (least privilege).
 
     scripts/run.sh nexus-accounts      write them into the Nexus database (nexus-server setup.sh runs it too)

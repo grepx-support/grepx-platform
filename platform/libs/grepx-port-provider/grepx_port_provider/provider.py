@@ -1,3 +1,7 @@
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 """Port registry: each service owns a port range, declared once in config/services.ini (`ports = 9100-9104`).
 get_free_port() hands a service the first free port of its own range, so ports are stable and never collide."""
 from __future__ import annotations

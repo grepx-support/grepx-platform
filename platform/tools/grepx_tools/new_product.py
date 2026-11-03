@@ -1,3 +1,7 @@
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 """Start a new product on the platform - nothing in platform/ or common-services/ is edited.
 
     scripts/run.sh new-product NAME [--title "Cooking Club"]

@@ -1,3 +1,7 @@
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 """Which code still types another service's name, request table or owned table as a string (phase 2 gate).
 
 A name belongs in grepx_contracts and in the owning service's own folder - nowhere else. Tests may use literals.

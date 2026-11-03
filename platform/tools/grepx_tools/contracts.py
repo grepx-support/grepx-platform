@@ -1,3 +1,7 @@
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 """scripts/run.sh contracts - write one contract module per service into platform/libs/grepx-contracts.
 
 A contract is what other code may rely on: the service's name, its request table, the state tables it owns,

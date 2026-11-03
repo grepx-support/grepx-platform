@@ -1,3 +1,7 @@
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 """MemoryClient - an in-process nexus_api ClientInterface over a NexusEngine.
 
 Used by tests and single-process dev runs: real criteria, real state

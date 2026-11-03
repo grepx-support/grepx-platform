@@ -1,3 +1,7 @@
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 """iCalendar (.ics) rendering for downloads and subscription feeds; time zone and naming come from the deployment."""
 from __future__ import annotations
 

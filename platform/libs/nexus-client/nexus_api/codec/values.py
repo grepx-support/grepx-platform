@@ -1,3 +1,7 @@
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 """Encode/decode a single field value using Nexus's wire tag scheme
 (i:/d:/b:/s:/n: only - the C++ nexus_server rejects any other tag; l:/u:/j: are still decoded for old rows).
 """

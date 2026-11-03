@@ -1,3 +1,7 @@
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 """Phase 5 gate: the platform libraries and generic services never speak one product's words in code
 (identifiers, string literals, config values). Comments and docstrings may give examples."""
 import io

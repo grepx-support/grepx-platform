@@ -1,3 +1,7 @@
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 """One control script for the whole platform (Linux / macOS).
 
     scripts/setup.sh [install|reset|db|list] [all|name]   # runs each service's own setup.sh
@@ -15,6 +19,7 @@
     scripts/run.sh db [all|name]                    # (re)create each service's database + tables (setup.sh does this too)
     scripts/run.sh migrate [NAME [--dry-run]]  # Nexus data migrations (platform/tools/migrations/), services stopped
     scripts/run.sh nexus-accounts       # one Nexus login per service + table ownership (NEXUS_SERVICE_SECRET)
+    scripts/run.sh headers [--dry-run|--remove]  # GrepX proprietary header in every source file of every repo
     scripts/run.sh workspace [pin]       # check grepx.workspace.yaml (versions, folders, Nexus checksum)
     scripts/run.sh new-product NAME      # a new product: deployment file, catalogue, plugins folder, project config
     scripts/run.sh trace TRACE_ID        # follow one request through every service
@@ -85,6 +90,7 @@ COMMANDS = {
     "migrate": lambda a: tool("migrate.py", *a),
     "nexus-accounts": lambda a: tool("nexus_accounts.py", *a),
     "workspace": lambda a: tool("pins.py", *a),
+    "headers": lambda a: tool("headers.py", *a),
     "new-product": lambda a: tool("new_product.py", *a),
     "nexus-check": lambda a: tool("nexus_check.py", *a),
     "trace": lambda a: tool("trace.py", *a),

@@ -1,3 +1,9 @@
+<!--
+  Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+  This file is part of the GrepX platform and is proprietary and confidential.
+  Unauthorised copying, use, modification or distribution is strictly prohibited.
+-->
+
 # Working on this repository (read first)
 
 This is the **GrepX platform**: Nexus hub + many small services + products assembled from them.

@@ -1,3 +1,7 @@
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 # Central monitoring for every GrepX project:   scripts/run.sh monitor   |   scripts/run.sh monitor down
 #   Prometheus   scrapes every service's /metrics (targets from scripts/run.sh targets)
 #   Promtail     tails ../logs/*.log (JSON lines: service, project, level, trace_id) into Loki

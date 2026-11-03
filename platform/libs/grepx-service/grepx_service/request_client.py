@@ -1,3 +1,7 @@
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 """RequestClient — the BFF side of the request/response pattern.
 
 submit a NEW row addressed to the owning service, then wait for ACCEPTED/REJECTED.

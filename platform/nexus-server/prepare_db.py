@@ -1,3 +1,7 @@
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 """Prepare the C++ nexus_server database: its schema + one Nexus user (stdlib only).
 
     python3 prepare_db.py bin/nexus_data.db USERNAME PASSWORD

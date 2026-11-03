@@ -1,3 +1,7 @@
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 """Plain WSGI apps (any callable(environ, start_response)) on the standard library — no framework needed.
 Also serves Flask/Django/Bottle apps, which are WSGI too, when no more specific adapter claims them."""
 from socketserver import ThreadingMixIn

@@ -1,3 +1,7 @@
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 """Phone numbers stored as E.164 (+6591234567) so search, WhatsApp and SMS all agree.
 
 The home country is a deployment setting (the product deployment file, see grepx_config.common):

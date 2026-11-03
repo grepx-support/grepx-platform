@@ -1,3 +1,7 @@
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 """Sealed setting values: "enc:" + SecretBox text, so secrets saved on the admin pages stay unreadable in Nexus rows.
 
     seal_value("s3cret") -> "enc:..."     open_value("enc:...") -> "s3cret"     open_value("plain") -> "plain"

@@ -1,3 +1,7 @@
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 """Data migrations for the Nexus database, described as data (platform/tools/migrations/<name>.yaml).
 
     scripts/run.sh migrate                       list the migrations

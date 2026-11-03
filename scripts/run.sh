@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 # Manage ALL services from here (inside a service folder, its own run.sh manages just that one).
 #   scripts/run.sh start   [all|name]      scripts/run.sh stop [all|name]      scripts/run.sh restart [all|name]
 #   scripts/run.sh status  [name]          UP / DOWN / STALE, counters, last error (heartbeats via Nexus)

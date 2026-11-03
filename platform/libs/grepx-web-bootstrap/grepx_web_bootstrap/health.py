@@ -1,3 +1,7 @@
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 """/health and /metrics for a service — framework-free by default.
 
 create_health_app(name) returns a plain WSGI app (standard library only), so a service needs no

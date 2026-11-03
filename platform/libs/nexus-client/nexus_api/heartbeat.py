@@ -1,3 +1,7 @@
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 """Heartbeat — every service reports itself to Nexus (`_health` table) so one place shows what is up.
 
 Row per service: pid, host, port, started_at, last_seen, plus counters supplied by the service

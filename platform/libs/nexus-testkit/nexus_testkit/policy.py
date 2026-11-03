@@ -1,3 +1,7 @@
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 """SUBMIT state machine - a copy of the C++ nexus_server's (libs/statemachine/transaction_transitions.hpp).
 
 A new row may start with any status; an existing row may only move along these edges.

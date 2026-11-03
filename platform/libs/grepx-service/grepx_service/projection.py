@@ -1,3 +1,7 @@
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 """A service's own database is a projection of the state rows it publishes - one write path, no dual writes.
 
 The Emitter writes state only to Nexus. Each service also subscribes to the tables it owns (`owns:` in config.yaml)

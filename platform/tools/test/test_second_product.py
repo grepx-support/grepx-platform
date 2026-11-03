@@ -1,3 +1,7 @@
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 """Phase 4/5 gate: a product made by `scripts/run.sh new-product` (a cooking club) runs on the generic services alone -
 its own person table, role names, catalogue and no plugins - without editing platform or generic code."""
 import sys

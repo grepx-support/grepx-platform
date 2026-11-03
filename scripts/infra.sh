@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 # Install and start the infrastructure described in config/infra.yaml (run this first).
 #   scripts/infra.sh            install toolchain + start the database engines the services are configured for
 #   scripts/infra.sh plan       which service uses which database

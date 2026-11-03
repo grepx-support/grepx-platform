@@ -1,3 +1,7 @@
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 """Everything a client needs to connect to nexus_server - the single door.
 
     from nexus_api import NexusClient, NexusApplication, RecoveringSubscriber, Row

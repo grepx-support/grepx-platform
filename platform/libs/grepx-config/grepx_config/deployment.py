@@ -1,3 +1,7 @@
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 """Deployment values (from .env), read in one place. Neutral defaults: nothing product-specific lives in code.
 
     SITE_URL   public address used in links (emails, calendars, certificates)

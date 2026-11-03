@@ -1,3 +1,7 @@
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 """Where a GrepX workspace's shared configuration lives - found from the caller's side, never from this library's own path.
 
 A workspace = a folder holding config/common.yaml (and config/projects/<project>.yaml), and usually grepx.workspace.yaml,

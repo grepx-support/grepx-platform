@@ -1,3 +1,7 @@
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 # Tail every service's log (one JSON object per line) into Loki.
 # Labels (few values, cheap to filter): project, service, level. The trace id stays in the line: search it with |= "<id>".
 server:

@@ -1,3 +1,7 @@
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 """grepx_bff — everything a product BFF shares: gateway, auth, errors, tracing, common routers, app factory.
 
     app = create_app(Gateway(client, cfg), [my_product_router, ...], "My product API", web_dir=..., product="kitchen")

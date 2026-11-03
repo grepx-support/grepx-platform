@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 # Manage THIS service on its own:  ./run.sh start | stop | restart | status | logs | test
 # Same as scripts/run.sh <command> <service-name> from the repo root, which manages all services.
 set -euo pipefail

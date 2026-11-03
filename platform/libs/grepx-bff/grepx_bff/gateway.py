@@ -1,3 +1,7 @@
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 """Gateway — the BFF's single door to Nexus: commands (request → verdict), reads, secrets, storage.
 
 API-gateway concerns live here once: idempotency keys, a circuit breaker around the bus, rate limits.

@@ -1,3 +1,7 @@
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 """The workspace file (grepx.workspace.yaml): what this deployment runs and the versions it is pinned to.
 
     scripts/run.sh workspace          check: library versions = platform.version, every registered service lives in a

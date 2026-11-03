@@ -1,3 +1,7 @@
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 # The product's person record moves to the generic people-service: blood donation's `donors` rows become `people` rows
 # (same keys, so logins, bookings, donations and referrals keep pointing at the same person). The blood fields stay on
 # the row; people-service validates them through the product's profile plugin. Run after 001, services stopped:

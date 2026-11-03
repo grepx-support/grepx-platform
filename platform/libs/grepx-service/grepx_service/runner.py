@@ -1,3 +1,7 @@
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 """Run a service: its database ready, its health app, one subscription per table it handles, a heartbeat.
 
 Every service has its request table; some also react to other tables (booking-service reacts to completed

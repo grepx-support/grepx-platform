@@ -1,3 +1,7 @@
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 """SecretBox — symmetric encryption for secrets that cross the Nexus bus (passwords) or are stored (admin-saved keys).
 
 Rows are kept in the outbox forever, so plaintext secrets must never be written there.

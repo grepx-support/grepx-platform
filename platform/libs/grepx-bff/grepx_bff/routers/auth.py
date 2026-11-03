@@ -1,3 +1,7 @@
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 """Common auth routes for every product: login, forgot / reset password, change password.
 (Sign-up is product-specific — each product creates its own profile first; see the product's routers/signup.py.)"""
 import grepx_contracts as gc

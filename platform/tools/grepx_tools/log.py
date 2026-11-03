@@ -1,3 +1,7 @@
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 """Same log format as platform/tools/log.sh:  2026-10-31 15:33:01 INFO  [component] message"""
 from __future__ import annotations
 

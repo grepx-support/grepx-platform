@@ -1,3 +1,7 @@
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 """Criteria language: a small, safe SQL WHERE subset, evaluated in Python.
 
     status = 'NEW' AND (to_service = 'x' OR from_service = 'x')

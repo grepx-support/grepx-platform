@@ -1,3 +1,7 @@
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 """Create a service's database and tables - by setup.sh, and again (create-if-missing) every time the service starts.
 
     python -m grepx_store <service-folder>

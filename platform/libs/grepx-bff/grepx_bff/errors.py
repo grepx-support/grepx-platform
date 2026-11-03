@@ -1,3 +1,7 @@
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 """Reason code → plain-language copy (one table for the whole API; unknown codes get a safe fallback)."""
 from fastapi import HTTPException
 

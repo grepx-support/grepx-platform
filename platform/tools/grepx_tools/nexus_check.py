@@ -1,3 +1,7 @@
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 """scripts/run.sh nexus-check - ask the running Nexus server which wire values it accepts.
 
 Sends one INSERT per sample (raw wire text) to table nexus_check and prints OK / the server's answer.

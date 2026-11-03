@@ -1,3 +1,7 @@
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 # Shared Python helpers for setup scripts (sourced after log.sh).
 #   find_python        -> sets PY to a Python 3.10+ (python3, python, py)
 #   make_venv DIR      -> creates DIR as a working virtualenv; on Debian/Ubuntu installs python3.X-venv if needed

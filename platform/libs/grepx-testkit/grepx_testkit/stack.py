@@ -1,3 +1,7 @@
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 """Run a whole product stack (many services) in one process on an in-memory Nexus — for e2e tests and demos.
 
 The wiring is the same as in production (grepx_service.serve): each service's request table plus the reactions it

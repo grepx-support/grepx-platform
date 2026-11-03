@@ -1,3 +1,7 @@
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 """grepx_auth — token, password and secret-transport primitives shared by auth-service and every BFF.
 
     tokens = TokenService.from_env()          # JWT (HS256) strategy, secret JWT_SECRET

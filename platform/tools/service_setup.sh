@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
 # platform/tools/service_setup.sh <service-folder> [install|reset|db] - shared by every service's own setup.sh.
 # Sets up ONE service: a private .venv with only its requirements, then its database and tables.
 #   ./setup.sh          install (or update) - safe to run again
