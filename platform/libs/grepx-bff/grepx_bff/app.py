@@ -48,6 +48,9 @@ def create_app(gw: Gateway, product_routers: Iterable[APIRouter], title: str, we
     for router in [*COMMON_ROUTERS, *product_routers]:
         app.include_router(router, prefix="/api/v1")
 
+    from .ops import mount_ops
+    mount_ops(app, gw)
+
     if web_dir is not None and web_dir.exists():          # the shared web UI, branded for this product
         app.mount("/assets", StaticFiles(directory=web_dir), name="web")
 

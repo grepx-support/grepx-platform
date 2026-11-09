@@ -65,7 +65,7 @@ def build() -> list[dict]:
     for layer in ("common", "product"):
         lines += [f"## {layer.title()} services", "", "| Service | Request table | Actions | Also uses | Summary |", "|---|---|---|---|---|"]
         for s in (s for s in services if s["layer"] == layer):
-            lines.append(f"| `{s['name']}`{' (' + s['product'] + ')' if s['product'] else ''} | `{s['request_table']}` | "
+            lines.append(f"| `{s['name']}`{' (' + s['product'] + ')' if s['product'] else ''} | {'`' + s['request_table'] + '`' if s['request_table'] else '(watches only)'} | "
                          f"{', '.join(s['actions'])} | {', '.join(s['other_tables'] + [t + ' (reacts)' for t in s['reacts_to']])} | {s['summary']} |")
         lines.append("")
     (ROOT / "docs" / "SERVICE_CATALOG.md").write_text("\n".join(lines), encoding="utf-8")

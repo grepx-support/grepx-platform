@@ -12,6 +12,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Iterable, Optional
 
+from grepx_config.workspace import read_yaml
 from grepx_service.serve import reactions
 
 from .harness import ServiceHarness, load_service
@@ -23,6 +24,8 @@ def start_stack(root: Path, layers: Iterable[str] = ("common-services", "product
     for layer in layers:
         for config in sorted((root / layer).glob("**/config/config.yaml")):
             service_dir = config.parent.parent
+            if "snapshot_table" not in read_yaml(config):
+                continue                                    # a watch-only service (e.g. a live monitor) handles no requests
             handle, cfg, modules = load_service(service_dir, settings)
             harness.add(cfg, cfg.snapshot_table, handle, cfg.live_criteria)
             find = lambda path, m=modules: getattr(m[path.rpartition(".")[0]], path.rpartition(".")[2])  # noqa: E731

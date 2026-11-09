@@ -51,6 +51,7 @@ Configuration, not code, makes a common service product-specific: templates (tem
 | Ports, which services run | `config/services.ini` | `grepx_port_provider`, `manage.py` |
 | Databases | `config/common.yaml` → deployment file → project → service `database:` | `grepx_store` |
 | Product error wording | `apps/<p>-bff/src/product_copy.py` → `register_copy()` | `grepx_bff.errors` |
+| Live operations screen (places on the map, headline numbers, title, who may open it) | deployment file `monitor:` | ops-monitor-service (`<site>/ops/`) |
 | Fields never sent to clients (secrets) | product BFF `register_hidden(...)` | `grepx_bff.views.clean` |
 | Admin-saved secrets ("enc:" values) | settings-service `app_settings` | `grepx_auth.open_settings / seal_value` |
 | Request envelope on rows | — | `grepx_service.state_of(row)` (never strip fields by hand) |
@@ -87,6 +88,7 @@ stays the one-line `serve(__file__)`) → tests with `ServiceHarness` → `confi
 * `scripts/run.sh test` (each suite in its own process) — add an end-to-end case in the product BFF test.
 * `scripts/run.sh start all && scripts/run.sh status` — everything UP; `scripts/run.sh logs errors`; `scripts/run.sh trace <id>`.
 * `scripts/run.sh catalog` so the next requirement can find what you built.
+* Watch it live at `<site>/ops/` (ops-monitor-service): new request tables appear there without any change.
 
 ## Adding a second product (example: kitchen)
 1. `scripts/run.sh new-product kitchen` — deployment file (person → people-service, roles, links, message templates per

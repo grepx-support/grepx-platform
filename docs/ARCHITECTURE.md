@@ -257,6 +257,7 @@ sequenceDiagram
 | referral-service | `referral_events` | `referral_scores` | people with a referrer, the deployment's conversion table (`referral.conversion`) |
 | event-report-service | `event_report_requests` | `event_reports` | attendance funnel, show / fill rate, slots, messages, tasks; product figures from the `event_report` plugin |
 | questionnaire-service | `questionnaire_requests` | — | CHECK / CHAT / CRITERIA, all from the `questionnaire` plugin |
+| ops-monitor-service | — (watches only) | `geo_cache` (its own DB) | the live operations screen at `<site>/ops/`: subscribes read-only to every request table (from `grepx_contracts`) and `dead_letters`, keeps a bounded window of envelope-only events (no names, phones or emails), traces, service health, headline numbers and a map of places - all set by the deployment file's `monitor:` section. Admins only (session token + role). See §10b |
 
 Product words never appear in these services: they read the person table, message templates per role, links, checklist and
 referral points from the product's deployment file, and product rules from its plugins (`grepx_service.plugins`).
@@ -389,6 +390,32 @@ scripts/run.sh restore DIR          # put a backup back (services stopped)
 ```
 
 Email/SMS/WhatsApp go to the log until `SMTP_*` / `TWILIO_*` are set. Media goes to `data/uploads` (or S3 with `MEDIA_STORAGE=s3`).
+
+## 10b. The live operations screen (ops-monitor-service)
+
+`<site>/ops/` - a full-screen dark map with the product's places, live pulses as requests touch them, a heat layer,
+"the wire" (every request and verdict as it happens), headline numbers, why requests were refused, service health,
+a System view (services as a graph, requests flowing between them) and a trace drawer for any line.
+
+```mermaid
+flowchart LR
+    SVC["every service's request table + dead_letters"] -->|SUBSCRIBE, read-only| MON["ops-monitor-service<br/>127.0.0.1:8970"]
+    ST["state tables (places, counts, kpis) + _health"] -->|SELECT every 5-30 s| MON
+    MON -->|"/api/* (admin token checked here)"| BFF["product BFF /ops/* (plain pass-through)"]
+    BFF --> BROWSER["browser: MapLibre map + wire + System view"]
+```
+
+* Generic: the service never knows what a place is. The deployment file's `monitor:` says which table is drawn
+  (`places:` table, label, address, date, capacity, `where`, per-place `counts`), which headline numbers (`kpis:`),
+  the map centre and geocoder (`onemap` for Singapore, `nominatim` anywhere, `known:` to pin an address), the words.
+  A second product gets its own screen by writing its own `monitor:` section - no code.
+* Safe to put on a wall: events keep only the envelope (table, status, action, reason, services, trace, hop, time) and
+  the configured reference field (e.g. `event_id`); the service also silences row-level client logging.
+* Honest numbers: request -> answer time is measured on the monitor's own clock between seeing NEW and the verdict;
+  p95 is shown only with 20+ samples; "dropped" counts events that fell out of the window.
+* A new service is watched automatically (its contract appears in `grepx_contracts`).
+* The map tiles (CARTO dark) and the map library (MapLibre GL) load in the viewer's browser from the internet;
+  without them the wire, numbers and System view still work.
 
 ## 10a-0. Script log format (every .sh and the Python tools)
 

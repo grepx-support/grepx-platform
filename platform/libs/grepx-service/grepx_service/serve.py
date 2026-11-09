@@ -13,6 +13,11 @@ Everything else comes from the service's config.yaml:
       - {table: drives, handler: jobs.handle_drive, when: "status = 'ACCEPTED' AND state = 'completed'"}
       - {table: ticks,  handler: jobs.handle_tick,  when: "to_service = '{service}' AND status = 'NEW'"}
     on_start: ticker.start                               optional background work started first (called with cfg)
+
+A read-only "edge" service (one that only watches, e.g. a live monitor) may leave out snapshot_table and routes, and use:
+    discover: feed.subscriptions                         more subscriptions worked out at start: fn(cfg) -> [Subscription]
+    web_app: web.create_app                              its own HTTP app instead of the plain /health one:
+                                                         fn(cfg, health_app) -> any app run_server can serve
 """
 from __future__ import annotations
 
@@ -60,19 +65,36 @@ def reactions(cfg: Any, find: Callable[[str], Callable] = resolve) -> list[Subsc
     return out
 
 
+def plan(cfg: Any, find: Callable[[str], Callable] = resolve) -> tuple[list[Subscription], Callable[[], Any]]:
+    """Every subscription the service runs and the factory of its web app, from its config."""
+    from grepx_web_bootstrap import create_health_app
+    from .metrics import snapshot
+    from .projection import subscriptions as projections
+
+    subs = []
+    if cfg.get("snapshot_table"):                       # a request table, handled by src/routes
+        subs.append(Subscription(cfg.snapshot_table, find("routes.handle"), cfg.live_criteria, cfg.recovery_criteria))
+    subs += reactions(cfg, find)
+    if cfg.get("discover"):
+        subs += list(find(cfg.discover)(cfg))
+    subs += projections(cfg)
+    if not subs:
+        raise ValueError(f"{cfg.get('service_name')}: nothing to run - no snapshot_table, subscriptions, discover or owns in config.yaml")
+
+    def web_app():
+        health = create_health_app(cfg.service_name, metrics=snapshot)
+        return find(cfg.web_app)(cfg, health) if cfg.get("web_app") else health
+    return subs, web_app
+
+
 def serve(main_file: str) -> None:
     """Run the service whose src/main.py is main_file: request table + declared reactions + health endpoint."""
     src = Path(main_file).resolve().parent
     sys.path.insert(0, str(src))
     from grepx_config import load_config
-    from grepx_web_bootstrap import create_health_app
-    from .metrics import snapshot
 
     cfg = load_config(src.parent / "config")
-    handle = importlib.import_module("routes").handle
     if cfg.get("on_start"):
         resolve(cfg.on_start)(cfg)
-    from .projection import subscriptions as projections
-    run_subscriptions(cfg, [Subscription(cfg.snapshot_table, handle, cfg.live_criteria, cfg.recovery_criteria), *reactions(cfg),
-                            *projections(cfg)],
-                      web_app_factory=lambda: create_health_app(cfg.service_name, metrics=snapshot))
+    subs, web_app = plan(cfg)
+    run_subscriptions(cfg, subs, web_app_factory=web_app)
