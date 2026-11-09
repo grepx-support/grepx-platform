@@ -32,10 +32,10 @@ def test_cooking_club_on_generic_services(tmp_path):
     assert all(seed_catalog(stack.requests, home / "catalog").values())
     call = lambda table, service, **f: stack.call(table, service, f)  # noqa: E731
 
-    cook = call("people_requests", "people-service", action="CREATE", name="Kim Cook", email="kim@club.sg", phone="9123 4567")
+    cook = call("people_requests", "people-service", action="CREATE", name="Kim Cook", email="kim@club.sg", phone="+65 9123 4567")   # with the country code: valid under any deployment's phone rules
     assert cook.ok, cook.reason
     pid = cook.fields["person_id"]
-    friend = call("people_requests", "people-service", action="CREATE", name="Lee Friend", email="lee@club.sg", phone="9123 4568",
+    friend = call("people_requests", "people-service", action="CREATE", name="Lee Friend", email="lee@club.sg", phone="+65 9123 4568",
                   invite_code=cook.fields["ref_code"]).fields["person_id"]
 
     event = call("event_requests", "event-service", action="CREATE", title="Dumpling night", venue="Club kitchen", event_date=TODAY,

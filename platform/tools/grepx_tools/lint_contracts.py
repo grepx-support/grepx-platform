@@ -18,7 +18,7 @@ import tokenize
 import yaml
 
 from log import say
-from workspace import ROOT, registry
+from workspace import ROOT, known_services as registry
 
 SKIP = (".venv/", "egg-info", "/test/", "platform/libs/grepx-contracts/", "platform/tools/")
 

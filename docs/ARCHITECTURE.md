@@ -391,6 +391,30 @@ scripts/run.sh restore DIR          # put a backup back (services stopped)
 
 Email/SMS/WhatsApp go to the log until `SMTP_*` / `TWILIO_*` are set. Media goes to `data/uploads` (or S3 with `MEDIA_STORAGE=s3`).
 
+## 10a-1. Several products on one machine
+
+Each product is its own workspace (the orchestrator puts each in its own folder with its own clones) with its own Nexus
+hub and database. To share a server they only need different ports:
+
+| | Where | blood-donation | kitchen |
+|---|---|---|---|
+| Nexus hub | `config/common.yaml` `nexus.port` (passed to the C++ server as `NEXUS_PORT`) | 7878 | 7880 |
+| services, BFF | `config/services.ini` `ports =` | 88xx-91xx, 8851 | 93xx-94xx, 8861 |
+
+A restarted service gets its first port back even while the old process's connections linger (the port check uses
+SO_REUSEADDR like the servers do), so a site does not move to the next port after a restart.
+
+**Shared web shell.** `web/` in grepx-platform (`index.html`, `app.js`, `ui.css`, `modules/core/`) is linked into each
+workspace; a product keeps only `apps/web/product.json` and `apps/web/modules/*.js` and passes both to
+`grepx_bff.create_app(web_dir=ROOT/"web", product_dir=ROOT/"apps/web")`. `/me` (grepx-bff) returns `is_staff` and `tenant`.
+
+**Organisations.** auth-service puts the login's `tenant` in the token; `Principal.tenant` carries it in every BFF. A
+multi-business product (kitchen) sends it as `tenant_id` on every command and filters every read by it.
+
+**Tests per workspace.** `scripts/run.sh test` runs every suite except the prefixes in `grepx.workspace.yaml`
+`tests.skip` (kitchen skips `common-services`, whose suites are written against blood donation's deployment file).
+Contracts are generated for every shipped generic service, so any workspace can import any contract.
+
 ## 10b. The live operations screen (ops-monitor-service)
 
 `<site>/ops/` - a full-screen dark map with the product's places, live pulses as requests touch them, a heat layer,

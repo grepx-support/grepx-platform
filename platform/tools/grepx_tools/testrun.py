@@ -27,8 +27,21 @@ def test_folders(root: Path = ROOT) -> list[Path]:
     return sorted(found)
 
 
+def skipped() -> list[str]:
+    """grepx.workspace.yaml `tests: {skip: [path prefix, ...]}` - suites this workspace does not run (e.g. the generic
+    services' own tests, which are written against the reference product's deployment file)."""
+    import yaml
+    marker = ROOT / "grepx.workspace.yaml"
+    data = yaml.safe_load(marker.read_text(encoding="utf-8")) if marker.exists() else {}
+    return [str(p).rstrip("/") + "/" for p in ((data or {}).get("tests") or {}).get("skip") or []]
+
+
 def run_tests(path: str = "") -> int:
-    suites = [Path(path)] if path else test_folders()
+    skip = skipped()
+    suites = [Path(path)] if path else [s for s in test_folders()
+                                        if not any((s.relative_to(ROOT).as_posix() + "/").startswith(p) for p in skip)]
+    if skip and not path:
+        say("INFO", "test", f"not run here (grepx.workspace.yaml tests.skip): {', '.join(skip)}")
     failed = []
     for suite in dict.fromkeys(suites):
         code = subprocess.call([sys.executable, "-m", "pytest", str(suite)], cwd=ROOT, env=env())

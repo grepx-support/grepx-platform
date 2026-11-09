@@ -19,7 +19,8 @@ from .routers import COMMON_ROUTERS
 
 
 def create_app(gw: Gateway, product_routers: Iterable[APIRouter], title: str, web_dir: Optional[Path] = None,
-               product: str = "") -> FastAPI:
+               product: str = "", product_dir: Optional[Path] = None) -> FastAPI:
+    """web_dir: the shared web shell (grepx-platform web/); product_dir: the product's modules/ and product.json."""
     app = FastAPI(title=title, version="1.0")
     app.state.gateway = gw
     app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"], expose_headers=["X-Trace-Id"])
@@ -52,11 +53,13 @@ def create_app(gw: Gateway, product_routers: Iterable[APIRouter], title: str, we
     mount_ops(app, gw)
 
     if web_dir is not None and web_dir.exists():          # the shared web UI, branded for this product
+        if product_dir is not None:                        # the product's own screens: modules/ + product.json, in its repo
+            app.mount(f"/assets/modules/{product}", StaticFiles(directory=product_dir / "modules"), name="product-web")
         app.mount("/assets", StaticFiles(directory=web_dir), name="web")
 
         @app.get("/product.json", include_in_schema=False)
         def product_config():
-            return FileResponse(web_dir / "products" / f"{product}.json")
+            return FileResponse(product_dir / "product.json" if product_dir is not None else web_dir / "products" / f"{product}.json")
 
         @app.get("/{path:path}", include_in_schema=False)
         def spa(path: str):

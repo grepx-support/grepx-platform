@@ -10,11 +10,12 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "grepx_tools"))
 
 import nexus_accounts  # noqa: E402
-from workspace import registry  # noqa: E402
+from workspace import known_services  # noqa: E402
 
 
 def test_owned_tables_exclude_request_tables():
-    owners = nexus_accounts.ownership(registry())
+    common = {k: {**v, "enabled": True} for k, v in known_services().items() if k in ("event-service", "people-service", "notification-service")}
+    owners = nexus_accounts.ownership(common)
     assert owners["event-service"] == ["events"] and owners["people-service"] == ["people"]
     assert owners["notification-service"] == []          # `notifications` is its request table: everyone submits there
     all_owned = [t for tables in owners.values() for t in tables]

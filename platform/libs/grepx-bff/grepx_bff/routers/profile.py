@@ -14,4 +14,4 @@ router = APIRouter(tags=["me"])
 @router.get("/me")
 def me(user: Principal = Depends(current_user), gw=Depends(gateway)):
     person = clean(gw.one(gw.people, user.user_id)) or {}
-    return {**person, "id": user.user_id, "role": user.role, "perms": user.perms}
+    return {**person, "id": user.user_id, "role": user.role, "perms": user.perms, "is_staff": user.is_staff, "tenant": user.tenant}

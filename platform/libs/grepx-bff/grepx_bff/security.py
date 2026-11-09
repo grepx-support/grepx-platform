@@ -22,6 +22,7 @@ class Principal:
     role: str
     perms: list[str] = field(default_factory=list)
     roles: Roles = field(default_factory=Roles)
+    tenant: str = ""            # the organisation the login belongs to (auth-service puts it in the token); "" = the platform
 
     @property
     def is_staff(self) -> bool:
@@ -48,7 +49,8 @@ def optional_user(authorization: Optional[str] = Header(default=None), gw=Depend
         raise ApiError("INVALID_SESSION", 401)
     access = gw.one(gc.access.USER_ACCESS, claims["sub"]) or {}
     roles = Roles.of(gw.cfg)
-    return Principal(claims["sub"], access.get("role") or claims.get("role") or roles.member, list(access.get("effective") or []), roles)
+    return Principal(claims["sub"], access.get("role") or claims.get("role") or roles.member, list(access.get("effective") or []), roles,
+                     str(claims.get("tenant") or ""))
 
 
 def current_user(user: Optional[Principal] = Depends(optional_user)) -> Principal:

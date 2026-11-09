@@ -36,6 +36,9 @@ def env(name: str = "") -> dict:
     e.update({"GREPX_HOME": str(ROOT), "GREPX_SERVICE": name, "LOG_FORMAT": e.get("LOG_FORMAT", "json"), "LOG_TO_FILE": "0", "PYTHONUNBUFFERED": "1"})
     e["PYTHONPATH"] = os.pathsep.join([str(p) for p in LIBS] + [e.get("PYTHONPATH", "")])
     e.setdefault("AUTH_DB_PATH", str(ROOT / "data" / "auth-service.db"))
+    if not e.get("NEXUS_PORT"):          # the hub listens where config/common.yaml says (one hub per product on a machine)
+        from grepx_config import nexus_address
+        e["NEXUS_PORT"] = str(nexus_address()[1])
     if name and name != "nexus-server" and e.get("NEXUS_SERVICE_SECRET"):   # its own Nexus login (nexus_accounts.py)
         from nexus_accounts import service_password
         e.update({"NEXUS_USERNAME": name, "NEXUS_PASSWORD": service_password(e["NEXUS_SERVICE_SECRET"], name)})
@@ -47,6 +50,18 @@ def registry() -> dict[str, dict]:
     ini.read(ROOT / "config" / "services.ini")
     return {name: {"path": ROOT / ini[name]["path"], "enabled": ini[name].getboolean("enabled", True),
                    "project": ini[name].get("project", "platform")} for name in ini.sections()}
+
+
+def known_services() -> dict[str, dict]:
+    """registry() plus every generic service shipped in common-services/ (they are released together): contracts and
+    tests cover them even when this product does not run all of them."""
+    import yaml
+    out = dict(registry())
+    for cfg in sorted((ROOT / "common-services").glob("**/config/config.yaml")):
+        name = (yaml.safe_load(cfg.read_text(encoding="utf-8")) or {}).get("service_name")
+        if name and name not in out and ".venv" not in cfg.parts:
+            out[name] = {"path": cfg.parent.parent, "enabled": False, "project": "platform"}
+    return out
 
 
 def python_for(path: Path) -> str:

@@ -1,0 +1,36 @@
+/*
+ * Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+ * This file is part of the GrepX platform and is proprietary and confidential.
+ * Unauthorised copying, use, modification or distribution is strictly prohibited.
+ */
+
+/* One stylesheet for every product; colours come from products/<product>.json (CSS variables). */
+:root { --primary: #e11d48; --primary-ink: #fff; --bg: #f8fafc; --card: #fff; --ink: #0f172a; --muted: #64748b; --line: #e2e8f0; --radius: 14px; }
+@media (prefers-color-scheme: dark) { :root { --bg: #0b1120; --card: #111827; --ink: #e5e7eb; --muted: #94a3b8; --line: #1f2937; } }
+* { box-sizing: border-box; } [hidden] { display: none !important; } body { margin: 0; font: 15px/1.5 system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background: var(--bg); color: var(--ink); }
+a { color: var(--primary); text-decoration: none; } h1 { font-size: 1.8rem; margin: .2em 0 .4em; } h2 { font-size: 1.2rem; margin: 0 0 .6em; }
+.top { display: flex; gap: 16px; align-items: center; padding: 10px 16px; background: var(--card); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 5; flex-wrap: wrap; }
+.brand { font-weight: 800; color: var(--ink); } .brand b { color: var(--primary); } #nav { display: flex; gap: 4px; flex-wrap: wrap; flex: 1; }
+#nav a { padding: 6px 10px; border-radius: 10px; color: var(--muted); } #nav a.on, #nav a:hover { background: color-mix(in srgb, var(--primary) 12%, transparent); color: var(--primary); }
+.wrap { max-width: 1100px; margin: 0 auto; padding: 20px 16px 60px; }
+.grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+.card { overflow-x: auto; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; }
+.hero { background: linear-gradient(135deg, var(--primary), color-mix(in srgb, var(--primary) 55%, #000)); color: var(--primary-ink); border-radius: 22px; padding: 28px; margin-bottom: 18px; }
+.btn { display: inline-flex; gap: 6px; align-items: center; border: 1px solid var(--line); background: var(--card); color: var(--ink); padding: 8px 14px; border-radius: 10px; cursor: pointer; font: inherit; }
+.btn.primary { background: var(--primary); color: var(--primary-ink); border-color: var(--primary); } .btn.small { padding: 4px 9px; font-size: 13px; } .btn:disabled { opacity: .5; }
+input, select, textarea { font: inherit; padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); color: var(--ink); width: 100%; }
+label { display: block; font-size: 13px; color: var(--muted); margin: 8px 0 3px; } .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; } .row > * { flex: 1; min-width: 140px; }
+table { width: 100%; border-collapse: collapse; } th, td { text-align: left; padding: 7px 6px; border-bottom: 1px solid var(--line); font-size: 14px; } th { color: var(--muted); font-weight: 600; }
+.badge { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12px; background: color-mix(in srgb, var(--primary) 12%, transparent); color: var(--primary); }
+.ok { color: #16a34a; } .bad { color: #dc2626; } .muted { color: var(--muted); } .stat { font-size: 2rem; font-weight: 800; }
+.slots { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 8px; } .slots button.on { background: var(--primary); color: var(--primary-ink); }
+.kanban { display: grid; grid-template-columns: repeat(4, minmax(200px, 1fr)); gap: 12px; overflow-x: auto; } .kanban .col { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 10px; min-height: 120px; }
+.item { border: 1px solid var(--line); border-radius: 10px; padding: 8px; margin: 6px 0; background: var(--bg); }
+#toast { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); display: grid; gap: 6px; z-index: 20; }
+#toast div { background: var(--ink); color: var(--bg); padding: 10px 14px; border-radius: 10px; max-width: 90vw; }
+.chat { max-height: 420px; overflow-y: auto; display: grid; gap: 8px; } .bubble { padding: 8px 12px; border-radius: 14px; max-width: 80%; white-space: pre-wrap; }
+.bubble.bot { background: var(--bg); border: 1px solid var(--line); } .bubble.me { background: var(--primary); color: var(--primary-ink); justify-self: end; }
+pre { white-space: pre-wrap; font-size: 12px; }
+
+@media (max-width: 640px) { #nav { flex-wrap: nowrap; overflow-x: auto; order: 3; flex-basis: 100%; } .wrap { padding: 14px 12px 60px; } h1 { font-size: 1.45rem; }
+  .btn { min-height: 44px; } input, select, textarea { min-height: 44px; font-size: 16px; } }

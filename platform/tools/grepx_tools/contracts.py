@@ -24,7 +24,7 @@ from pathlib import Path
 import yaml
 
 from log import say
-from workspace import ROOT, registry
+from workspace import ROOT, known_services as registry
 
 OUT = ROOT / "platform" / "libs" / "grepx-contracts" / "grepx_contracts"
 PROBE = r'''
@@ -85,7 +85,7 @@ def main(check: bool = False) -> int:
         # a service's dto may import other contracts: write names-only modules first, so every import resolves
         OUT.mkdir(parents=True, exist_ok=True)
         for name, text in build(with_enums=False).items():
-            if not (OUT / f"{name}.py").exists():
+            if name == "__init__" or not (OUT / f"{name}.py").exists():     # the index must list every module before dtos import them
                 (OUT / f"{name}.py").write_text(text, encoding="utf-8")
     files = build()
     stale = [n for n, text in files.items() if not (OUT / f"{n}.py").exists() or (OUT / f"{n}.py").read_text(encoding="utf-8") != text]

@@ -26,7 +26,8 @@ def libraries() -> dict[str, str]:
     out = {}
     for lib in sorted(LIBS_DIR.iterdir()):
         for pkg in lib.iterdir():
-            if (pkg / "__init__.py").exists() and not pkg.name.endswith(".egg-info"):
+            own = pkg.is_dir() and pkg.name == lib.name.replace("-", "_")      # its package even before code is generated into it
+            if ((pkg / "__init__.py").exists() or own) and not pkg.name.endswith(".egg-info"):
                 out[pkg.name] = lib.name
     return out
 
@@ -73,6 +74,17 @@ def order(deps: dict[str, set[str]]) -> list[str]:
     return out
 
 
+def notice(lines: list[str]) -> list[str]:
+    """The copyright lines a file starts with (kept when the file is rewritten), with the blank line after them."""
+    keep = []
+    for line in lines:
+        if line.startswith("# Copyright") or (keep and line.startswith("# ") and len(keep) < 3):
+            keep.append(line)
+        else:
+            break
+    return keep + [""] if keep else []
+
+
 def write_requirements(folder: Path, deps: dict[str, set[str]], ordered: list[str]) -> None:
     req = folder / "requirements.txt"
     lines = req.read_text(encoding="utf-8").splitlines() if req.exists() else []
@@ -80,7 +92,7 @@ def write_requirements(folder: Path, deps: dict[str, set[str]], ordered: list[st
     up = "/".join([".."] * len(folder.relative_to(ROOT).parts))
     head = [f"# {folder.relative_to(ROOT).as_posix()} - library lines are written by scripts/run.sh deps"]
     third = [l for l in lines if l.strip() and not l.startswith(("#", "-e "))]
-    req.write_text("\n".join(head + [f"-e {up}/platform/libs/{l}" for l in ordered if l in need] + third) + "\n", encoding="utf-8")
+    req.write_text("\n".join(notice(lines) + head + [f"-e {up}/platform/libs/{l}" for l in ordered if l in need] + third) + "\n", encoding="utf-8")
 
 
 def write_pyprojects(deps: dict[str, set[str]]) -> None:
@@ -104,8 +116,9 @@ def main() -> int:
         if (svc["path"] / "src").exists():
             write_requirements(svc["path"], deps, ordered)
     root = ROOT / "requirements.txt"
-    third = [l for l in root.read_text(encoding="utf-8").splitlines() if l.strip() and not l.startswith(("#", "-e "))]
-    root.write_text("\n".join(["# Every platform library + tooling in one environment (scripts/setup.sh)."] +
+    lines = root.read_text(encoding="utf-8").splitlines()
+    third = [l for l in lines if l.strip() and not l.startswith(("#", "-e "))]
+    root.write_text("\n".join(notice(lines) + ["# Every platform library + tooling in one environment (scripts/setup.sh)."] +
                               [f"-e platform/libs/{l}" for l in ordered] + third) + "\n", encoding="utf-8")
     say("OK", "deps", f"{len(ordered)} libraries, no cycles; requirements written")
     return 0

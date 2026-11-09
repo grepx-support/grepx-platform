@@ -42,8 +42,12 @@ def port_ranges() -> dict[str, tuple[int, int]]:
 
 
 def is_port_free(port: int) -> bool:
+    """True when a server could listen on the port now. SO_REUSEADDR as the servers themselves use it: connections of a
+    process that just stopped linger in TIME_WAIT for a minute and must not push a restarted service onto the next port
+    (a public site moving from 8851 to 8852 looks down). A port someone is listening on still counts as taken."""
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             s.bind(("0.0.0.0", port))
             return True
     except OSError:
