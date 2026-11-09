@@ -23,7 +23,7 @@ services:
     command: -config.file=/etc/promtail/promtail.yml
     volumes:
       - ./promtail/promtail.yml:/etc/promtail/promtail.yml:ro
-      - ../logs:/grepx/logs:ro
+      - ${GREPX_LOGS:-../logs}:/grepx/logs:ro      # the workspace logs folder (monitor passes its absolute path)
       - promtail-data:/promtail
   prometheus:
     image: prom/prometheus:v2.54.1

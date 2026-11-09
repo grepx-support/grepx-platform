@@ -130,4 +130,8 @@ def observability(args: list[str]) -> int:
     Old Elasticsearch/Logstash containers from earlier versions are removed (--remove-orphans)."""
     env_file = ["--env-file", str(ROOT / ".env")] if (ROOT / ".env").exists() else []
     command = args or ["up", "-d", "--remove-orphans"]
-    return subprocess.call(["docker", "compose", *env_file, "-f", str(ROOT / "observability" / "docker-compose.yml"), *command])
+    if command[0] == "up":
+        targets_file()          # Prometheus scrapes what is running now, not a stale list
+    # observability/ may be a link into grepx-platform: give Promtail the workspace logs folder as an absolute path
+    env = {**os.environ, "GREPX_LOGS": str(ROOT / "logs")}
+    return subprocess.call(["docker", "compose", *env_file, "-f", str(ROOT / "observability" / "docker-compose.yml"), *command], env=env)
