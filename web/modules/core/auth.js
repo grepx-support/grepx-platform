@@ -11,7 +11,7 @@ export const routes = [
   { path: "/login", render: (el) => {
     el.innerHTML = `<div class="card" style="max-width:420px;margin:auto"><h1>Log in</h1><p class="muted">One login for ${esc(state.product.name)} — you'll see what's meant for you.</p>
       <form id="f"><label>Email</label><input name="email" type="email" required><label>Password</label><input name="password" type="password" required>
-      <label><input type="checkbox" name="remember" style="width:auto"> Keep me signed in for 7 days</label>
+      <label class="check"><input type="checkbox" name="remember"> Keep me signed in for 7 days</label>
       <p><button class="btn primary">Log in</button> <a href="#/forgot">Forgot password?</a></p></form>
       ${state.product.signup === false ? "" : '<p class="muted">New here? <a href="#/register">Create an account</a></p>'}</div>`;
     el.querySelector("#f").onsubmit = async (e) => {

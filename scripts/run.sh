@@ -8,7 +8,7 @@
 #   scripts/run.sh status  [name]          UP / DOWN / STALE, counters, last error (heartbeats via Nexus)
 #   scripts/run.sh logs    [name|errors|TRACE_ID]
 #   scripts/run.sh trace   TRACE_ID        one request across every service
-#   scripts/run.sh monitor [down]          Prometheus + Loki + Grafana -> http://<server>:3000 (logs, metrics, trace ids)
+#   scripts/run.sh monitor [down]          Prometheus + Loki + Grafana -> http://<server>:GRAFANA_PORT (default 3000)
 #   scripts/run.sh targets                 refresh Prometheus scrape targets after starting services
 #   scripts/run.sh seed | admin EMAIL PASS NAME PHONE | test [path] | find WORD | catalog | new ...
 #   scripts/run.sh nexus-check            which value formats the running Nexus server accepts

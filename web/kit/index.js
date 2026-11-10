@@ -31,4 +31,5 @@ export { sparkline } from "./charts/sparkline.js";
 export { DataTable } from "./ui/data-table.js";
 export { kpi, kpiRow } from "./ui/kpi.js";
 export { confirm, openDialog } from "./ui/modal.js";
+export { revealPasswords } from "./ui/password.js";
 export { avatar, empty, pageHead, pill, progress, steps, tabs } from "./ui/parts.js";

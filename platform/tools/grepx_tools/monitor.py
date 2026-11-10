@@ -134,4 +134,10 @@ def observability(args: list[str]) -> int:
         targets_file()          # Prometheus scrapes what is running now, not a stale list
     # observability/ may be a link into grepx-platform: give Promtail the workspace logs folder as an absolute path
     env = {**os.environ, "GREPX_LOGS": str(ROOT / "logs")}
-    return subprocess.call(["docker", "compose", *env_file, "-f", str(ROOT / "observability" / "docker-compose.yml"), *command], env=env)
+    code = subprocess.call(["docker", "compose", *env_file, "-f", str(ROOT / "observability" / "docker-compose.yml"), *command], env=env)
+    if command[0] == "up" and code == 0:
+        from workspace import dotenv
+        e = {**dotenv(), **os.environ}
+        print(f"Grafana: http://<this server>:{e.get('GRAFANA_PORT', '3000')}  (user admin, password GRAFANA_PASSWORD in .env)"
+              f" - stack {e.get('MONITOR_NAME', 'grepx-observability')}; open the port once: ufw allow {e.get('GRAFANA_PORT', '3000')}/tcp")
+    return code

@@ -37,6 +37,9 @@
 .kit-pill.warn { background: color-mix(in srgb, var(--warn) 18%, transparent); color: var(--warn); }
 .kit-pill.info { background: color-mix(in srgb, var(--info) 15%, transparent); color: var(--info); }
 
+.kit-reveal { position: relative; display: block; }
+.kit-reveal input { padding-right: 46px; }
+.kit-reveal .kit-iconbtn { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); border: 0; background: transparent; }
 .kit-search { position: relative; display: block; margin: 0 0 10px; }
 .kit-search .kit-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--muted); }
 .kit-search input { padding-left: 34px; }

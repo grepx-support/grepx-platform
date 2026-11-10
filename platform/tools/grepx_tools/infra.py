@@ -107,7 +107,7 @@ def up() -> None:
     if INFRA.get("monitoring"):
         from monitor import observability
         observability([])
-        print("monitoring up: Grafana http://<this server>:3000")
+        print(f"monitoring up: Grafana http://<this server>:{os.environ.get('GRAFANA_PORT', '3000')}")
 
 
 def status() -> None:

@@ -5,7 +5,7 @@
  */
 
 // Hash routes (#/path?query): find the route, check the user may open it, render it into #view.
-import { esc } from "../kit/index.js";
+import { esc, revealPasswords } from "../kit/index.js";
 import { outside, visible } from "./session.js";
 import { renderNav } from "./nav.js";
 import { state } from "./state.js";
@@ -48,6 +48,7 @@ export async function route() {
   view().replaceChildren(page);
   try {
     await r.render(page, { ...params, args });
+    revealPasswords(page);                                 // every password box gets "show password"
   } catch (e) {
     page.innerHTML = `<div class="card"><h2>Couldn't load this page</h2><p>${esc(e.message)}</p>${e.trace ? `<p class="muted">trace ${esc(e.trace)}</p>` : ""}</div>`;
   }

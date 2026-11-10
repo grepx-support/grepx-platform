@@ -23,7 +23,7 @@
     scripts/run.sh workspace [pin]       # check grepx.workspace.yaml (versions, folders, Nexus checksum)
     scripts/run.sh new-product NAME      # a new product: deployment file, catalogue, plugins folder, project config
     scripts/run.sh trace TRACE_ID        # follow one request through every service
-    scripts/run.sh monitor [down]        # Prometheus + Loki + Grafana (docker) -> http://<server>:3000
+    scripts/run.sh monitor [down]        # Prometheus + Loki + Grafana (docker) -> http://<server>:GRAFANA_PORT (3000)
     scripts/run.sh targets               # refresh Prometheus targets from heartbeats
     scripts/run.sh demo [ARGS]           # optional demo data: runs the product's demo/seed.py (see its --help)
     scripts/run.sh dbview [start|stop|status|list]  # read-only web viewer of Nexus + every service database (Datasette)
