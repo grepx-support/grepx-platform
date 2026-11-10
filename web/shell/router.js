@@ -6,7 +6,7 @@
 
 // Hash routes (#/path?query): find the route, check the user may open it, render it into #view.
 import { esc, revealPasswords } from "../kit/index.js";
-import { outside, visible } from "./session.js";
+import { allowed, outside, visible } from "./session.js";
 import { renderNav } from "./nav.js";
 import { state } from "./state.js";
 
@@ -43,6 +43,12 @@ export async function route() {
     const home = state.routes.find((x) => x.nav && visible(x));
     if (r.path === "/" && home) { location.hash = `#${home.path}`; return; }   // the operator's home is their first page
     view().innerHTML = outsideMessage();
+    return;
+  }
+  if (state.me && r.auth && !allowed(r)) {                 // typed or bookmarked: say so, rather than fail on the API
+    const home = state.routes.find((x) => x.nav && visible(x));
+    view().innerHTML = `<div class="card"><h2>No access to this page</h2><p>Your account cannot open this page. Ask the owner if you need it.</p>
+      ${home ? `<p><a class="btn primary" href="#${home.path}">Go to ${esc(home.nav)}</a></p>` : ""}</div>`;
     return;
   }
   // Each visit renders into its own element: a slower page from an earlier click can never overwrite this one.

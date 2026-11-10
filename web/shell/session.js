@@ -39,7 +39,8 @@ export const can = (perm) => !!state.me && (state.me.role === "admin" || (state.
 
 /** A route marked tenant: true works inside one business/organisation (/me tenant); a platform operator has none. */
 export const outside = (r) => !!(r.tenant && state.me && !state.me.tenant);
-const allowed = (r) => (r.auth === "staff" ? staff() && can(r.perm) : r.auth === "user" ? !!state.me : r.auth === "admin" ? state.me?.role === "admin" : true);
+/** The signed-in user may open this route (role and permission); the server checks again on every call. */
+export const allowed = (r) => (r.auth === "staff" ? staff() && can(r.perm) : r.auth === "user" ? !!state.me : r.auth === "admin" ? state.me?.role === "admin" : true);
 /** A route marked platform: true is for the platform itself (no organisation) - hidden while inside one. */
 const insideOnly = (r) => !!(r.platform && state.me?.tenant);
 export const visible = (r) => !r.nav || (!outside(r) && !insideOnly(r) && allowed(r));

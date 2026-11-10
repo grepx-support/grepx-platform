@@ -64,3 +64,13 @@ test("memory store has the local store's interface", () => {
   s.set("k", { a: 1 }); assert.deepEqual(s.get("k"), { a: 1 });
   s.remove("k"); assert.equal(s.get("k"), null);
 });
+
+test("a basket keeps its defaults when a setting is passed as undefined (builder without extras)", async () => {
+  const { Basket } = await import("../basket/basket.js");
+  const b = new Basket({ lines: [{ item_id: "a", qty: 2, expiry: "2026-01-01" }, { item_id: "b", qty: 0 }], extras: undefined, step: undefined, label: undefined });
+  assert.equal(b.props.step, 1);
+  assert.equal(b.props.label, "Quantity");
+  assert.deepEqual(b.lines(), [{ item_id: "a", qty: 2 }]);
+  const lot = new Basket({ lines: [{ item_id: "a", qty: 2, expiry: "2026-01-01" }], extras: [{ name: "expiry", label: "Expiry", type: "date" }] });
+  assert.deepEqual(lot.lines(), [{ item_id: "a", qty: 2, expiry: "2026-01-01" }]);
+});

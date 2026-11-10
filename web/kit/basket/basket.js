@@ -17,7 +17,8 @@ export class Basket extends Component {
    *           extras: [{name, label, type: "date"|"text"|"select", options: [[value, label]]}] - more fields per line }
    *  emits "change" (lines) */
   constructor(props) {
-    super({ step: 1, label: "Quantity", extras: [], ...props, lines: (props.lines || []).map((l) => ({ ...l })) });
+    const given = Object.fromEntries(Object.entries(props).filter(([, v]) => v !== undefined));   // unset = keep the default
+    super({ step: 1, label: "Quantity", extras: [], ...given, lines: (props.lines || []).map((l) => ({ ...l })) });
     this.events = new Emitter();
   }
 
