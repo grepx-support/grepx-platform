@@ -7,7 +7,7 @@
 // Broadcasts, delivery log and automatic-message wording (common template + notification services).
 import { api, can, esc, run, state } from "../../app.js";
 
-export const routes = [{ path: "/messages", nav: "Messages", auth: "staff", perm: "view_log", render: async function draw(el) {
+export const routes = [{ path: "/messages", nav: "Messages", icon: "message", group: "Platform", area: "#ec4899", auth: "staff", perm: "view_log", render: async function draw(el) {
   const log = await api("/admin/messages/log");
   const auto = can("*") || true ? await api("/admin/messages/automatic").catch(() => []) : [];
   el.innerHTML = `<h1>Messages</h1>

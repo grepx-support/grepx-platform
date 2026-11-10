@@ -1,0 +1,54 @@
+/*
+ * Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+ * This file is part of the GrepX platform and is proprietary and confidential.
+ * Unauthorised copying, use, modification or distribution is strictly prohibited.
+ */
+
+// Hash routes (#/path?query): find the route, check the user may open it, render it into #view.
+import { esc } from "../kit/index.js";
+import { outside, visible } from "./session.js";
+import { renderNav } from "./nav.js";
+import { state } from "./state.js";
+
+const view = () => document.querySelector("#view");
+
+function match(path) {
+  for (const r of state.routes) {
+    const m = path.match(new RegExp("^" + r.path.replace(/:\w+/g, "([^/]+)") + "$"));
+    if (m) return { r, args: m.slice(1) };
+  }
+  return null;
+}
+
+function outsideMessage() {
+  const home = state.routes.find((x) => x.nav && visible(x));
+  return `<div class="card"><h2>This page belongs to a business</h2><p>You are signed in as the platform operator,
+    who does not belong to any business. Sign in with a business owner's or staff account to use it.</p>
+    ${home ? `<p><a class="btn primary" href="#${home.path}">Go to ${esc(home.nav)}</a></p>` : ""}</div>`;
+}
+
+export async function route() {
+  const [path, query] = (location.hash.slice(1) || "/").split("?");
+  const params = Object.fromEntries(new URLSearchParams(query || ""));
+  const found = match(path);
+  renderNav();
+  if (!found) { view().innerHTML = '<div class="card"><h2>Not found</h2></div>'; return; }
+  const { r, args } = found;
+  if (r.auth && !state.me) { location.hash = "#/login"; return; }
+  if (outside(r)) {
+    const home = state.routes.find((x) => x.nav && visible(x));
+    if (r.path === "/" && home) { location.hash = `#${home.path}`; return; }   // the operator's home is their first page
+    view().innerHTML = outsideMessage();
+    return;
+  }
+  // Each visit renders into its own element: a slower page from an earlier click can never overwrite this one.
+  const page = document.createElement("div");
+  page.className = "page";
+  page.innerHTML = '<div class="kit-skeleton"></div>';
+  view().replaceChildren(page);
+  try {
+    await r.render(page, { ...params, args });
+  } catch (e) {
+    page.innerHTML = `<div class="card"><h2>Couldn't load this page</h2><p>${esc(e.message)}</p>${e.trace ? `<p class="muted">trace ${esc(e.trace)}</p>` : ""}</div>`;
+  }
+}

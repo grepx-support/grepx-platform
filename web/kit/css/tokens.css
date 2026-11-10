@@ -1,0 +1,29 @@
+/*
+ * Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+ * This file is part of the GrepX platform and is proprietary and confidential.
+ * Unauthorised copying, use, modification or distribution is strictly prohibited.
+ */
+
+/* Design tokens: one set of names, two themes. Products override --primary (product.json theme) and area colours. */
+:root, :root[data-theme="light"] {
+  color-scheme: light;
+  --primary: #6d28d9; --primary-ink: #fff;
+  --accent: var(--primary);
+  --bg: #f3f5fb; --bg-2: #e9edf7; --card: #ffffff; --card-2: #f8faff;
+  --ink: #0f172a; --ink-2: #334155; --muted: #64748b; --line: #e3e8f2;
+  --good: #059669; --bad: #e11d48; --warn: #d97706; --info: #2563eb;
+  --shadow: 0 1px 2px rgb(15 23 42 / .06), 0 8px 24px -12px rgb(15 23 42 / .18);
+  --shadow-lg: 0 18px 50px -18px rgb(15 23 42 / .35);
+  --glow: 0 0 0 4px color-mix(in srgb, var(--primary) 18%, transparent);
+  --radius: 16px; --radius-sm: 10px;
+  --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --side: 248px;
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #080c18; --bg-2: #0e1426; --card: #111a2e; --card-2: #16213a;
+  --ink: #e8ecf6; --ink-2: #c3cbe0; --muted: #8b97b5; --line: #222e4a;
+  --good: #34d399; --bad: #fb7185; --warn: #fbbf24; --info: #60a5fa;
+  --shadow: 0 1px 2px rgb(0 0 0 / .4), 0 10px 30px -14px rgb(0 0 0 / .7);
+  --shadow-lg: 0 24px 60px -20px rgb(0 0 0 / .8);
+}

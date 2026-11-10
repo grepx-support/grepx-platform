@@ -9,7 +9,7 @@ import { api, esc, run, state } from "../../app.js";
 
 const COLS = [["todo", "To do"], ["in_progress", "In progress"], ["blocked", "Blocked"], ["done", "Done"]];
 
-export const routes = [{ path: "/tasks", nav: "Tasks", auth: "staff", render: async function draw(el, q) {
+export const routes = [{ path: "/tasks", nav: "Tasks", icon: "task", group: "Platform", area: "#f59e0b", auth: "staff", render: async function draw(el, q) {
   const tasks = await api(`/tasks?scope=${q.scope || "mine"}${q.ref ? `&ref=${q.ref}` : ""}`);
   el.innerHTML = `<div class="row"><h1>Tasks</h1><span><a class="btn small" href="#/tasks?scope=mine">Mine</a> <a class="btn small" href="#/tasks?scope=all">Everyone</a></span></div>
     <form id="new" class="card row"><div><label>New task</label><input name="title" required></div><div><label>Due</label><input name="due_at" type="datetime-local"></div><button class="btn primary">Add</button></form><br>

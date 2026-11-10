@@ -1,0 +1,77 @@
+/*
+ * Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+ * This file is part of the GrepX platform and is proprietary and confidential.
+ * Unauthorised copying, use, modification or distribution is strictly prohibited.
+ */
+
+/* Elements and the classic classes every page uses (card, btn, row, grid, table, badge). */
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; font: 15px/1.55 var(--font); background: var(--bg); color: var(--ink); transition: background .25s, color .25s; }
+a { color: var(--primary); text-decoration: none; }
+h1 { font-size: 1.75rem; line-height: 1.2; margin: .1em 0 .3em; letter-spacing: -.02em; }
+h2 { font-size: 1.12rem; margin: 0 0 .7em; letter-spacing: -.01em; }
+h3 { font-size: 1rem; margin: 0; }
+.muted { color: var(--muted); } .small, small { font-size: 12.5px; }
+.ok { color: var(--good); } .bad { color: var(--bad); } .warn { color: var(--warn); }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.wrap { width: 100%; max-width: 1280px; margin: 0 auto; padding: 22px 24px 70px; }
+.grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+.grid.two { grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); }
+.row { display: flex; gap: 12px; flex-wrap: wrap; align-items: end; } .row > * { flex: 1; min-width: 150px; }
+.stack { display: grid; gap: 16px; }
+
+.card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow); overflow-x: auto; }
+.card.flat { box-shadow: none; }
+.card.accent { border-top: 4px solid var(--area, var(--primary)); }
+.hero { background: radial-gradient(120% 140% at 0% 0%, color-mix(in srgb, var(--primary) 85%, #fff) 0%, var(--primary) 45%, color-mix(in srgb, var(--primary) 50%, #000) 100%);
+  color: var(--primary-ink); border-radius: 22px; padding: 26px 28px; margin-bottom: 18px; box-shadow: var(--shadow-lg); }
+
+.btn { display: inline-flex; gap: 7px; align-items: center; justify-content: center; border: 1px solid var(--line); background: var(--card); color: var(--ink);
+  padding: 9px 15px; border-radius: 12px; cursor: pointer; font: 600 14px var(--font); transition: transform .12s, box-shadow .2s, background .2s; text-decoration: none; }
+.btn:hover { box-shadow: var(--shadow); transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+.btn.primary { background: linear-gradient(135deg, color-mix(in srgb, var(--primary) 80%, #fff), var(--primary)); color: var(--primary-ink); border-color: transparent;
+  box-shadow: 0 8px 20px -10px var(--primary); }
+.btn.danger { background: var(--bad); color: #fff; border-color: transparent; }
+.btn.small { padding: 5px 10px; font-size: 13px; border-radius: 10px; }
+.btn:disabled { opacity: .5; pointer-events: none; }
+:focus-visible { outline: none; box-shadow: var(--glow); }
+
+input, select, textarea { font: inherit; padding: 9px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--card-2); color: var(--ink); width: 100%;
+  transition: border-color .15s, box-shadow .15s; }
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: var(--glow); }
+input[type=checkbox], input[type=radio] { width: auto; accent-color: var(--primary); }
+label { display: block; font-size: 12.5px; font-weight: 600; color: var(--muted); margin: 10px 0 4px; }
+label.check { display: flex; gap: 8px; align-items: center; color: var(--ink); font-weight: 500; font-size: 14px; }
+
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: 9px 8px; border-bottom: 1px solid var(--line); font-size: 14px; vertical-align: middle; }
+th { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+td.end, th.end { text-align: right; }
+tbody tr:hover td { background: color-mix(in srgb, var(--primary) 4%, transparent); }
+
+.badge { display: inline-block; padding: 1px 9px; border-radius: 999px; font-size: 12px; font-weight: 600;
+  background: color-mix(in srgb, var(--area, var(--primary)) 14%, transparent); color: var(--area, var(--primary)); }
+.stat { font-size: 2rem; font-weight: 800; letter-spacing: -.02em; }
+.item { border: 1px solid var(--line); border-radius: 12px; padding: 9px 12px; margin: 6px 0; background: var(--card-2); }
+pre { white-space: pre-wrap; font-size: 13px; background: var(--card-2); border: 1px solid var(--line); border-radius: 12px; padding: 12px; }
+details summary { cursor: pointer; font-weight: 600; color: var(--primary); margin: 10px 0; }
+
+#toast { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); display: grid; gap: 8px; z-index: 60; }
+#toast div { background: var(--ink); color: var(--bg); padding: 11px 16px; border-radius: 12px; max-width: 92vw; box-shadow: var(--shadow-lg); animation: kit-pop .25s ease-out; }
+
+/* Kept for older screens (slots, kanban, chat) */
+.slots { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 8px; } .slots button.on { background: var(--primary); color: var(--primary-ink); }
+.kanban { display: grid; grid-template-columns: repeat(4, minmax(200px, 1fr)); gap: 12px; overflow-x: auto; }
+.kanban .col { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 10px; min-height: 120px; }
+.chat { max-height: 420px; overflow-y: auto; display: grid; gap: 8px; } .bubble { padding: 8px 12px; border-radius: 14px; max-width: 80%; white-space: pre-wrap; }
+.bubble.bot { background: var(--card-2); border: 1px solid var(--line); } .bubble.me { background: var(--primary); color: var(--primary-ink); justify-self: end; }
+
+@keyframes kit-pop { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: none; } }
+@keyframes kit-fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes kit-shimmer { from { background-position: -200% 0; } to { background-position: 200% 0; } }
+@keyframes kit-shake { 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
