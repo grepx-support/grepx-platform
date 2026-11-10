@@ -14,6 +14,8 @@
 #   scripts/run.sh nexus-check            which value formats the running Nexus server accepts
 #   scripts/run.sh backup | restore DIR   every service database + Nexus + pictures (git push with BACKUP_GIT_REMOTE)
 #   scripts/run.sh migrate [NAME]         Nexus data migrations (platform/tools/migrations/) - stop the services first
+#   scripts/run.sh dbview [start|stop|status|list]  read-only web viewer of Nexus + service databases (ssh tunnel)
+#   scripts/run.sh demo [ARGS]            optional demo data of this product (demo/seed.py)
 #   scripts/run.sh workspace [pin]        check grepx.workspace.yaml | scripts/run.sh new-product NAME   start a product
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"

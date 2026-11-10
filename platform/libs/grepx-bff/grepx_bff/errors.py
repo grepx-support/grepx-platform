@@ -13,6 +13,7 @@ COPY = {   # reason codes of the common services; each product registers its own
     "SELF_DEMOTION": "You can't demote yourself.", "LAST_ADMIN": "Keep at least one admin.", "NOT_AN_IMAGE": "That file isn't an image.",
     "TOO_LARGE": "Images must be under 15 MB.", "UNKNOWN_PLACEHOLDER": "Only the listed {placeholders} can be used.",
     "MISSING_FIELD": "Some required details are missing.",
+    "READ_ONLY_SUPPORT": "You are viewing as platform support (read only) - nothing can be changed.",
 }
 
 

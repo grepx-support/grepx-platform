@@ -9,6 +9,7 @@ description = "grepx_bff — everything a product BFF shares: gateway, auth, err
 requires-python = ">=3.10"
 # GrepX libraries listed here are checked against the imports by platform/tools/test/test_deps.py
 dependencies = [
+    "grepx-audit",
     "grepx-auth",
     "grepx-common",
     "grepx-config",

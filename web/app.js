@@ -8,15 +8,16 @@
 // modules/core (all products) and the product's own folder. This file only wires the parts together and starts the app;
 // each part is its own file under shell/ (state, api, session, nav, router, toast) and the UI kit is under kit/.
 import { esc, LocalStore, Theme, ThemeToggle } from "./kit/index.js";
-import { api, run } from "./shell/api.js";
+import { api, onUnauthorized, run } from "./shell/api.js";
 import { renderNav } from "./shell/nav.js";
 import { route } from "./shell/router.js";
 import { can, loadMe, login, logout, onSessionChange } from "./shell/session.js";
 import { state } from "./shell/state.js";
+import { enterSupport, exitSupport, supportBanner } from "./shell/support.js";
 import { toast } from "./shell/toast.js";
 
 // The API every module has always imported from "../../app.js".
-export { api, can, esc, login, logout, renderNav, run, state, toast };
+export { api, can, enterSupport, esc, exitSupport, login, logout, renderNav, run, state, toast };
 
 export const store = new LocalStore(`grepx.${location.host}`);
 export const theme = new Theme(store);
@@ -49,6 +50,8 @@ async function boot() {
     state.routes.push(...mod.routes);
   }
   onSessionChange(renderNav);
+  onSessionChange(supportBanner);
+  onUnauthorized(async () => { if (!(await exitSupport())) logout(); });   // an expired support session goes back, not out
   await loadMe();
   window.addEventListener("hashchange", route);
   route();

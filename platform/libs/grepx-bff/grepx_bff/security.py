@@ -23,6 +23,8 @@ class Principal:
     perms: list[str] = field(default_factory=list)
     roles: Roles = field(default_factory=Roles)
     tenant: str = ""            # the organisation the login belongs to (auth-service puts it in the token); "" = the platform
+    support: bool = False       # a platform admin working inside `tenant` with a support token (see support.py)
+    read_only: bool = False     # ... that may look but not change anything
 
     @property
     def is_staff(self) -> bool:
@@ -40,7 +42,10 @@ def gateway(request: Request):
     return request.app.state.gateway
 
 
-def optional_user(authorization: Optional[str] = Header(default=None), gw=Depends(gateway)) -> Optional[Principal]:
+READS = ("GET", "HEAD", "OPTIONS")
+
+
+def optional_user(request: Request, authorization: Optional[str] = Header(default=None), gw=Depends(gateway)) -> Optional[Principal]:
     if not authorization or not authorization.lower().startswith("bearer "):
         return None
     try:
@@ -49,8 +54,21 @@ def optional_user(authorization: Optional[str] = Header(default=None), gw=Depend
         raise ApiError("INVALID_SESSION", 401)
     access = gw.one(gc.access.USER_ACCESS, claims["sub"]) or {}
     roles = Roles.of(gw.cfg)
-    return Principal(claims["sub"], access.get("role") or claims.get("role") or roles.member, list(access.get("effective") or []), roles,
+    user = Principal(claims["sub"], access.get("role") or claims.get("role") or roles.member, list(access.get("effective") or []), roles,
                      str(claims.get("tenant") or ""))
+    if claims.get("act_tenant"):
+        user = support_principal(user, claims)
+        if user.read_only and request.method not in READS:
+            raise ApiError("READ_ONLY_SUPPORT", 403)
+    return user
+
+
+def support_principal(user: Principal, claims: dict) -> Principal:
+    """A support token: a platform admin (no organisation of their own) sees one organisation with every permission."""
+    if not user.is_admin or user.tenant:
+        raise ApiError("INVALID_SESSION", 401)              # only the platform's own admins can hold one
+    return Principal(user.user_id, user.role, ["*"], user.roles, str(claims["act_tenant"]), support=True,
+                     read_only=claims.get("support") != "edit")
 
 
 def current_user(user: Optional[Principal] = Depends(optional_user)) -> Principal:

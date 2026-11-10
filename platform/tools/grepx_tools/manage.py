@@ -25,6 +25,8 @@
     scripts/run.sh trace TRACE_ID        # follow one request through every service
     scripts/run.sh monitor [down]        # Prometheus + Loki + Grafana (docker) -> http://<server>:3000
     scripts/run.sh targets               # refresh Prometheus targets from heartbeats
+    scripts/run.sh demo [ARGS]           # optional demo data: runs the product's demo/seed.py (see its --help)
+    scripts/run.sh dbview [start|stop|status|list]  # read-only web viewer of Nexus + every service database (Datasette)
 Logs: logs/<name>.log   PIDs: run/<name>.pid
 """
 from __future__ import annotations
@@ -67,17 +69,54 @@ def db(args: list[str]) -> int:
     return 0
 
 
-def restart(target: str) -> None:
-    stop(target)
+def demo(args: list[str]) -> int:
+    """A product's optional demo data (demo/seed.py in the workspace), run with the platform environment."""
+    seed = ROOT / "demo" / "seed.py"
+    if not seed.exists():
+        print("this product has no demo data (demo/seed.py)")
+        return 1
+    return subprocess.call([sys.executable, str(seed), *args], cwd=ROOT, env=env())
+
+
+def with_dbview(action: str, target: str) -> int | None:
+    """start/stop all also starts/stops the database viewer when .env has DBVIEW=on."""
+    import dbview
+    if target != "all" or not dbview.enabled():
+        return None
+    return dbview.start() if action == "start" else dbview.stop()
+
+
+def start_all(target: str) -> None:
     start(target)
+    with_dbview("start", target)
+
+
+def stop_all(target: str) -> None:
+    with_dbview("stop", target)
+    stop(target)
+
+
+def restart(target: str) -> None:
+    stop_all(target)
+    start_all(target)
+
+
+def status_all(only: str) -> int:
+    code = status(only)
+    if not only or only == "all":
+        import dbview
+        dbview.status(verbose=False)
+    return code
 
 
 COMMANDS = {
     "setup": setup,
-    "start": lambda a: start(a[0] if a else "all"),
-    "stop": lambda a: stop(a[0] if a else "all"),
+    "start": lambda a: start_all(a[0] if a else "all"),
+    "stop": lambda a: stop_all(a[0] if a else "all"),
     "restart": lambda a: restart(a[0] if a else "all"),
-    "status": lambda a: status(a[0] if a else ""),
+    "status": lambda a: status_all(a[0] if a else ""),
+    "dbview": lambda a: __import__("dbview").main(a),
+    "demo": demo,
     "targets": lambda a: targets_file(),
     "logs": logs,
     "test": lambda a: run_tests(a[0] if a else ""),
