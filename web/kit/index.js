@@ -32,4 +32,6 @@ export { DataTable } from "./ui/data-table.js";
 export { kpi, kpiRow } from "./ui/kpi.js";
 export { confirm, openDialog } from "./ui/modal.js";
 export { revealPasswords } from "./ui/password.js";
+export { canScan, scanBarcode } from "./ui/scanner.js";
+export { SignaturePad } from "./ui/signature-pad.js";
 export { avatar, empty, pageHead, pill, progress, steps, tabs } from "./ui/parts.js";

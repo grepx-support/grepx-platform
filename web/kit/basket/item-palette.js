@@ -9,9 +9,11 @@ import { Component } from "../core/component.js";
 import { html } from "../core/dom.js";
 import { Emitter } from "../core/emitter.js";
 import { icon } from "../icons/icons.js";
+import { canScan, scanBarcode } from "../ui/scanner.js";
 
 export class ItemPalette extends Component {
-  /** props: { items: [{id, name, unit, category, hint}], title } - emits "pick" (item) */
+  /** props: { items: [{id, name, unit, category, hint, barcode}], title, scan } - emits "pick" (item); scan: a camera button
+   *  that picks the item whose barcode was scanned (where the browser can scan) */
   constructor(props) {
     super(props);
     this.events = new Emitter();
@@ -29,7 +31,8 @@ export class ItemPalette extends Component {
   render() {
     const cats = this.categories();
     return html`<aside class="kit-palette"><header><h3>${icon("box")} ${this.props.title || "Items"}</h3>
-        <label class="kit-search">${icon("search", { size: 16 })}<input type="search" placeholder="Find an item" value="${this.query}" aria-label="Find an item"></label>
+        <div class="kit-prow"><label class="kit-search">${icon("search", { size: 16 })}<input type="search" placeholder="Find an item" value="${this.query}" aria-label="Find an item"></label>
+        ${this.props.scan && canScan() ? html`<button type="button" class="kit-iconbtn" data-scan aria-label="Scan a barcode" title="Scan a barcode">${icon("scan")}</button>` : ""}</div>
         ${cats.length > 1 ? html`<div class="kit-chips"><button type="button" class="kit-chip ${this.category ? "" : "on"}" data-cat="">All</button>
           ${cats.map((c) => html`<button type="button" class="kit-chip ${c === this.category ? "on" : ""}" data-cat="${c}">${c}</button>`)}</div>` : ""}
       </header><div class="kit-plist">${this.visible().map((i) => html`<div class="kit-pchip" data-drag data-id="${i.id}">
@@ -43,6 +46,13 @@ export class ItemPalette extends Component {
     const input = this.el.querySelector("input");
     input.oninput = () => { this.query = input.value; const at = input.selectionStart; this.update(); const next = this.el.querySelector("input"); next.focus(); next.setSelectionRange(at, at); };
     this.el.querySelectorAll("[data-cat]").forEach((b) => b.onclick = () => { this.category = b.dataset.cat; this.update(); });
+    this.el.querySelector("[data-scan]")?.addEventListener("click", async () => {
+      const code = await scanBarcode();
+      if (!code) return;
+      const item = this.props.items.find((i) => i.barcode && i.barcode === code);
+      if (item) this.events.emit("pick", item);
+      else { this.query = code; this.update(); }
+    });
     this.el.querySelectorAll("[data-pick]").forEach((b) => b.onclick = () => this.events.emit("pick", this.item(b.closest("[data-id]").dataset.id)));
   }
 

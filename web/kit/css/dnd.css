@@ -33,6 +33,7 @@ body.kit-drag-active, body.kit-drag-active * { cursor: grabbing !important; user
 /* palette + basket */
 .kit-builder { display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; align-items: start; }
 .kit-palette { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; box-shadow: var(--shadow); position: sticky; top: 70px; }
+.kit-prow { display: flex; gap: 6px; align-items: flex-start; } .kit-prow .kit-search { flex: 1; }
 .kit-palette h3 { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
 .kit-palette .kit-chips { margin-bottom: 10px; }
 .kit-plist { display: grid; gap: 6px; max-height: 52vh; overflow-y: auto; padding-right: 4px; }
@@ -45,7 +46,10 @@ body.kit-drag-active, body.kit-drag-active * { cursor: grabbing !important; user
 .kit-bempty .kit-icon { color: var(--area, var(--primary)); opacity: .7; }
 .kit-blines { display: grid; gap: 8px; }
 .kit-bline { display: grid; grid-template-columns: 1fr auto auto auto; gap: 8px; align-items: center; padding: 8px 10px; border-radius: 12px; background: var(--card); border: 1px solid var(--line); animation: kit-pop .2s ease-out; }
-.kit-bname { display: grid; } .kit-bname small { color: var(--muted); }
+.kit-bname { display: grid; }
+.kit-bextra { grid-column: 1 / -1; display: flex; gap: 8px; flex-wrap: wrap; }
+.kit-bextra label { margin: 0; display: grid; gap: 2px; flex: 1; min-width: 120px; }
+.kit-bextra input, .kit-bextra select { padding: 5px 8px; min-height: 0; font-size: 13px; } .kit-bname small { color: var(--muted); }
 .kit-stepper { display: flex; align-items: center; gap: 4px; } .kit-stepper input { width: 84px; text-align: center; padding: 6px; }
 .kit-unit { color: var(--muted); font-size: 13px; min-width: 28px; }
 

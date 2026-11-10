@@ -4,17 +4,20 @@
 
 """Browse the databases in a web page: the Nexus database plus every service's own database (read-only).
 
-    scripts/run.sh dbview [start]     start it in the background and print how to open it
-    scripts/run.sh dbview stop
-    scripts/run.sh dbview status      running or not, its port, and the commands to reach it
-    scripts/run.sh dbview list        which databases it shows
+    scripts/dbview.sh                 start it (if needed) and print the address, user and password
+    scripts/dbview.sh stop | status | list
+    (same as scripts/run.sh dbview ...)
 
 Uses Datasette (open source, installed into the tooling .venv on first start). Every SQLite file is opened read-only, so
-browsing can never change data. It listens on 127.0.0.1 only and has no login of its own: reach it from your PC through
-an SSH tunnel (the command is printed) - never open its port on the firewall.
+browsing can never change data. The page asks for a user name and password (datasette-auth-passwords); the password is
+generated into .env on first start and printed by `status`.
 
-.env:  DBVIEW=on           also start / stop it with `scripts/run.sh start|stop all` and show it in `status`
-       DBVIEW_PORT=8890    first port to try (the next free one is used if taken, e.g. by another product)
+.env:  DBVIEW=on                 also start / stop it with `scripts/run.sh start|stop all` and show it in `status`
+       DBVIEW_PORT=8890          its port (fixed, so the firewall rule stays valid; it refuses to start if taken)
+       DBVIEW_HOST=0.0.0.0       0.0.0.0 = open from a browser at http://<server>:<port>/ (open the port: ufw allow)
+                                 127.0.0.1 = only through an ssh tunnel
+       DBVIEW_USER=admin         login name
+       DBVIEW_PASSWORD=          generated when empty
 
 Postgres / Mongo databases (when a service is switched to them) are listed with how to reach them; Datasette shows
 SQLite only - use DBeaver / pgAdmin / Compass through the same kind of tunnel.
@@ -23,6 +26,7 @@ from __future__ import annotations
 
 import json
 import os
+import secrets
 import signal
 import socket
 import subprocess
@@ -80,6 +84,18 @@ def databases() -> tuple[dict[str, Path], dict[str, str]]:
     return files, others
 
 
+# Datasette plugin: a visitor who is not logged in goes to the login page instead of a bare "Forbidden".
+LOGIN_FIRST = """from datasette import hookimpl
+from datasette.utils.asgi import Response
+
+
+@hookimpl
+def forbidden(request, message):
+    if not request.actor:
+        return Response.redirect("/-/login")
+"""
+
+
 def pid() -> int | None:
     try:
         p = int(PID.read_text())
@@ -100,12 +116,31 @@ def free(port: int) -> bool:
             return False
 
 
-def pick_port() -> int:
-    first = int(setting("DBVIEW_PORT", "8890"))
-    for port in range(first, first + 50):
-        if free(port):
-            return port
-    raise SystemExit(f"no free port between {first} and {first + 49}")
+def port_setting() -> int:
+    return int(setting("DBVIEW_PORT", "8890"))
+
+
+def host_setting() -> str:
+    return setting("DBVIEW_HOST", "0.0.0.0")
+
+
+def user() -> str:
+    return setting("DBVIEW_USER", "admin")
+
+
+def password() -> str:
+    """DBVIEW_PASSWORD from .env; generated and saved there the first time."""
+    value = setting("DBVIEW_PASSWORD")
+    if value:
+        return value
+    value = secrets.token_urlsafe(12)
+    path = ROOT / ".env"
+    lines = path.read_text(encoding="utf-8").splitlines() if path.exists() else []
+    lines = [line for line in lines if not line.strip().startswith("DBVIEW_PASSWORD=")] + [f"DBVIEW_PASSWORD={value}"]
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    os.environ["DBVIEW_PASSWORD"] = value
+    say("OK", NAME, "generated a password and saved it in .env (DBVIEW_PASSWORD)")
+    return value
 
 
 def server_host() -> str:
@@ -116,23 +151,30 @@ def server_host() -> str:
 
 def how_to_open(port: int) -> None:
     host = server_host()
+    if host_setting() == "127.0.0.1":
+        where = (f"only through a tunnel: ssh -N -L {port}:127.0.0.1:{port} <user>@{host}\n"
+                 f"                then open http://localhost:{port}/")
+    else:
+        where = f"http://{host}:{port}/      (first time on this server: ufw allow {port}/tcp)"
     print(f"""
-  Database viewer ({product()}) - read-only, listening on 127.0.0.1:{port} of this server
-    on the server itself : curl http://127.0.0.1:{port}/
-    from your PC         : ssh -N -L {port}:127.0.0.1:{port} <user>@{host}
-                           then open http://localhost:{port}/ in your browser (keep the ssh window open)
-    stop                 : scripts/run.sh dbview stop
-    log                  : logs/{NAME}.log
+  Database viewer - {product()} (read-only)
+    open      : {where}
+    user      : {user()}
+    password  : {password()}
+    stop      : scripts/dbview.sh stop        status: scripts/dbview.sh status
+    log       : logs/{NAME}.log
 """)
 
 
 def ensure_datasette() -> bool:
     try:
         import datasette  # noqa: F401
+        import datasette_auth_passwords  # noqa: F401
         return True
     except ImportError:
         say("INFO", NAME, "installing Datasette into the tooling .venv (first start only)")
-        code = subprocess.call([sys.executable, "-m", "pip", "install", "-q", "datasette>=0.64,<1"])
+        code = subprocess.call([sys.executable, "-m", "pip", "install", "-q", "datasette>=0.64,<1",
+                                "datasette-auth-passwords>=1.1,<2"])
         if code:
             say("ERROR", NAME, "pip install datasette failed - check the network, then try again")
         return code == 0
@@ -152,11 +194,20 @@ def start() -> int:
         return 1
     RUN.mkdir(exist_ok=True)
     LOGS.mkdir(exist_ok=True)
-    port = pick_port()
+    port = port_setting()
+    if not free(port):
+        say("ERROR", NAME, f"port {port} is taken - set another DBVIEW_PORT in .env (each product needs its own)")
+        return 1
+    from datasette_auth_passwords.utils import hash_password
     meta = RUN / f"{NAME}.metadata.json"
-    meta.write_text(json.dumps({"title": f"{product()} databases (read-only)",
-                                "description": "Nexus is the shared database every service talks through; "
-                                               "the others are each service's own tables."}))
+    meta.write_text(json.dumps({
+        "title": f"{product()} databases (read-only)",
+        "description": "Nexus is the shared database every service talks through (open nexus_rows and pick a "
+                       "table_name); the others are each service's own tables.",
+        "allow": {"id": user()},                                   # nothing is visible before logging in
+        "plugins": {"datasette-auth-passwords": {f"{user()}_password_hash": {"$env": "DBVIEW_PASSWORD_HASH"}}},
+    }))
+    meta.chmod(0o600)
     # Each file gets a readable name in the page (nexus, stock-service, ...) through a symlink folder.
     links = RUN / f"{NAME}-db"
     links.mkdir(exist_ok=True)
@@ -167,11 +218,15 @@ def start() -> int:
         link = links / f"{name}.db"
         link.symlink_to(path)
         paths.append(str(link))
-    command = [sys.executable, "-m", "datasette", "serve", *paths, "--host", "127.0.0.1", "--port", str(port),
+    plugins = RUN / f"{NAME}-plugins"
+    plugins.mkdir(exist_ok=True)
+    (plugins / "login_first.py").write_text(LOGIN_FIRST, encoding="utf-8")
+    command = [sys.executable, "-m", "datasette", "serve", *paths, "--plugins-dir", str(plugins), "--host", host_setting(), "--port", str(port),
                "--metadata", str(meta), "--setting", "sql_time_limit_ms", "3000",
                "--setting", "max_returned_rows", "2000", "--setting", "allow_download", "off"]
     log = open(LOGS / f"{NAME}.log", "a", encoding="utf-8")
-    proc = subprocess.Popen(command, cwd=ROOT, stdout=log, stderr=subprocess.STDOUT, start_new_session=True)
+    run_env = {**os.environ, "DBVIEW_PASSWORD_HASH": hash_password(password())}
+    proc = subprocess.Popen(command, cwd=ROOT, env=run_env, stdout=log, stderr=subprocess.STDOUT, start_new_session=True)
     PID.write_text(str(proc.pid))
     PORT_FILE.write_text(str(port))
     for _ in range(40):
@@ -183,7 +238,7 @@ def start() -> int:
         time.sleep(0.25)
     say("OK", NAME, f"started pid={proc.pid}, {len(files)} databases, port {port}")
     for name, url in others.items():
-        say("INFO", NAME, f"{name} uses {url} - not shown here; open it with DBeaver/pgAdmin/Compass through a tunnel")
+        say("INFO", NAME, f"{name} uses {url} - not shown here (Datasette reads SQLite); use DBeaver/pgAdmin/Compass")
     how_to_open(port)
     return 0
 
@@ -214,13 +269,13 @@ def status(verbose: bool = True) -> int:
     if not verbose:
         state = "UP" if running else ("DOWN" if enabled() else "off")
         print(f"{NAME:26} {state:10} {running or '-':>7} {port:>5}  read-only database viewer"
-              + (f" -> scripts/run.sh dbview status" if running else ""))
+              + (" -> scripts/dbview.sh status" if running else ""))
         return 0
     if running:
         say("OK", NAME, f"running (pid {running})")
         how_to_open(int(port))
     else:
-        say("INFO", NAME, "not running - start it with: scripts/run.sh dbview start")
+        say("INFO", NAME, "not running - start it with: scripts/dbview.sh")
     return 0
 
 

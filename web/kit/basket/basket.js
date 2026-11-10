@@ -13,9 +13,11 @@ import { icon } from "../icons/icons.js";
 const num = (v) => (v === "" || v == null || Number.isNaN(Number(v)) ? "" : Number(v));
 
 export class Basket extends Component {
-  /** props: { lines: [{item_id, name, unit, qty, hint}], label: "Send", empty, step } - emits "change" (lines) */
+  /** props: { lines: [{item_id, name, unit, qty, hint}], label: "Send", empty, step,
+   *           extras: [{name, label, type: "date"|"text"|"select", options: [[value, label]]}] - more fields per line }
+   *  emits "change" (lines) */
   constructor(props) {
-    super({ step: 1, label: "Quantity", ...props, lines: (props.lines || []).map((l) => ({ ...l })) });
+    super({ step: 1, label: "Quantity", extras: [], ...props, lines: (props.lines || []).map((l) => ({ ...l })) });
     this.events = new Emitter();
   }
 
@@ -28,9 +30,17 @@ export class Basket extends Component {
     this.changed();
   }
 
-  /** [{item_id, qty}] with a quantity above zero (or zero too when keepZero). */
+  /** [{item_id, qty, ...extras that were filled}] with a quantity above zero (or zero too when keepZero). */
   lines(keepZero = false) {
-    return this.props.lines.filter((l) => l.qty !== "" && (keepZero || l.qty > 0)).map((l) => ({ item_id: l.item_id, qty: Number(l.qty) }));
+    return this.props.lines.filter((l) => l.qty !== "" && (keepZero || l.qty > 0)).map((l) => ({ item_id: l.item_id, qty: Number(l.qty),
+      ...Object.fromEntries(this.props.extras.filter((x) => l[x.name]).map((x) => [x.name, l[x.name]])) }));
+  }
+
+  extraInputs(l) {
+    if (!this.props.extras.length) return "";
+    return html`<div class="kit-bextra">${this.props.extras.map((x) => html`<label>${x.label}${x.type === "select"
+      ? html`<select data-extra="${x.name}"><option value="">-</option>${(x.options || []).map(([v, t]) => html`<option value="${v}" ${l[x.name] === v ? "selected" : ""}>${t}</option>`)}</select>`
+      : html`<input type="${x.type || "text"}" data-extra="${x.name}" value="${l[x.name] || ""}">`}</label>`)}</div>`;
   }
 
   render() {
@@ -38,10 +48,11 @@ export class Basket extends Component {
     return html`<div class="kit-basket" data-drop>${lines.length ? html`<div class="kit-blines">${lines.map((l) => html`
       <div class="kit-bline" data-line="${l.item_id}"><div class="kit-bname"><b>${l.name}</b>${l.hint ? html`<small>${l.hint}</small>` : ""}</div>
         <div class="kit-stepper"><button type="button" class="kit-iconbtn small" data-dec aria-label="Less ${l.name}">${icon("minus", { size: 16 })}</button>
-          <input type="number" inputmode="decimal" min="0" step="any" value="${l.qty}" aria-label="${label} ${l.name}">
+          <input type="number" inputmode="decimal" min="0" step="any" value="${l.qty}" data-qty aria-label="${label} ${l.name}">
           <button type="button" class="kit-iconbtn small" data-inc aria-label="More ${l.name}">${icon("plus", { size: 16 })}</button></div>
         <span class="kit-unit">${l.unit || ""}</span>
-        <button type="button" class="kit-iconbtn small danger" data-remove aria-label="Remove ${l.name}">${icon("x", { size: 16 })}</button></div>`)}</div>`
+        <button type="button" class="kit-iconbtn small danger" data-remove aria-label="Remove ${l.name}">${icon("x", { size: 16 })}</button>
+        ${this.extraInputs(l)}</div>`)}</div>`
       : html`<div class="kit-bempty">${icon("inbox", { size: 34 })}<p>${empty}</p></div>`}</div>`;
   }
 
@@ -49,7 +60,8 @@ export class Basket extends Component {
     const step = this.props.step;
     this.el.querySelectorAll("[data-line]").forEach((row) => {
       const line = this.props.lines.find((l) => l.item_id === row.dataset.line);
-      const input = row.querySelector("input");
+      const input = row.querySelector("[data-qty]");
+      row.querySelectorAll("[data-extra]").forEach((x) => x.onchange = () => { line[x.dataset.extra] = x.value; this.changed(); });
       input.oninput = () => { line.qty = num(input.value); this.changed(); };
       row.querySelector("[data-inc]").onclick = () => { line.qty = num(line.qty || 0) + step; input.value = line.qty; this.changed(); };
       row.querySelector("[data-dec]").onclick = () => { line.qty = Math.max(0, num(line.qty || 0) - step); input.value = line.qty; this.changed(); };

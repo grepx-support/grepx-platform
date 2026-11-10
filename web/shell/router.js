@@ -34,7 +34,11 @@ export async function route() {
   renderNav();
   if (!found) { view().innerHTML = '<div class="card"><h2>Not found</h2></div>'; return; }
   const { r, args } = found;
-  if (r.auth && !state.me) { location.hash = "#/login"; return; }
+  document.body.classList.toggle("bare", !!r.bare);        // a page without the app frame (e.g. a public landing page)
+  if (r.auth && !state.me) {                               // visitors: the product's landing page on its home, else the login
+    location.hash = path === "/" && state.product.landing ? state.product.landing : "#/login";
+    return;
+  }
   if (outside(r)) {
     const home = state.routes.find((x) => x.nav && visible(x));
     if (r.path === "/" && home) { location.hash = `#${home.path}`; return; }   // the operator's home is their first page

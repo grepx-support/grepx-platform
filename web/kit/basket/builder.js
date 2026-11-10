@@ -12,11 +12,11 @@ import { Basket } from "./basket.js";
 import { ItemPalette } from "./item-palette.js";
 
 export class Builder extends Component {
-  /** props: { items, lines, label, title, empty, step, onChange(lines) } */
+  /** props: { items, lines, label, title, empty, step, extras (see Basket), scan (barcode button), onChange(lines) } */
   constructor(props) {
     super(props);
-    this.palette = new ItemPalette({ items: props.items, title: props.title });
-    this.basket = new Basket({ lines: props.lines, label: props.label, empty: props.empty, step: props.step });
+    this.palette = new ItemPalette({ items: props.items, title: props.title, scan: props.scan });
+    this.basket = new Basket({ lines: props.lines, label: props.label, empty: props.empty, step: props.step, extras: props.extras });
     this.palette.events.on("pick", (item) => this.basket.add(item));
     if (props.onChange) this.basket.events.on("change", props.onChange);
   }

@@ -97,3 +97,6 @@ a.kit-kpi:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
 .kit-steps li.on { color: var(--ink); border-color: var(--area, var(--primary)); } .kit-steps li.on span { background: var(--area, var(--primary)); color: #fff; }
 .kit-steps li.done span { background: var(--good); color: #fff; }
 .kit-skeleton { height: 90px; border-radius: 12px; background: linear-gradient(90deg, var(--bg-2) 25%, var(--card-2) 50%, var(--bg-2) 75%); background-size: 200% 100%; animation: kit-shimmer 1.4s linear infinite; }
+.kit-scan { width: 100%; border-radius: 12px; background: #000; }
+.kit-sign { display: grid; gap: 8px; justify-items: start; }
+.kit-sign canvas { width: 100%; height: auto; border: 2px dashed var(--line); border-radius: 12px; background: #fff; touch-action: none; }
