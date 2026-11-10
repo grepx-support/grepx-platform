@@ -16,6 +16,7 @@ from __future__ import annotations
 import itertools
 import logging
 import socket
+from collections import deque
 from typing import Optional
 
 from ..interfaces.connection_interface import ConnectionInterface
@@ -23,12 +24,16 @@ from ..interfaces.connection_interface import ConnectionInterface
 logger = logging.getLogger(__name__)
 
 _next_conn_id = itertools.count(1)
+_QUICKACK = getattr(socket, "TCP_QUICKACK", None)     # Linux only; elsewhere the default ACK timing applies
 
 
 class TcpConnection(ConnectionInterface):
     def __init__(self, host: str, port: int):
         self._sock = socket.create_connection((host, port))
-        self._buf = b""
+        # Small request/response lines: send each one at once (no Nagle wait).
+        self._sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+        self._buf = b""                 # an incomplete last line
+        self._lines: deque[bytes] = deque()   # complete lines received, not yet read
         # Purely for log correlation, same idea as nexus_server's conn_id —
         # one NexusClient can hold two connections at once (the persistent
         # one plus a dedicated subscribe one), so tagging lines by id keeps
@@ -41,14 +46,19 @@ class TcpConnection(ConnectionInterface):
         self._sock.sendall((line + "\n").encode())
 
     def recv_line(self) -> Optional[str]:
-        while b"\n" not in self._buf:
-            chunk = self._sock.recv(4096)
+        while not self._lines:
+            # nexus_server writes a SELECT answer as many small lines and (without TCP_NODELAY on its side) holds the
+            # next one until this end acknowledges; Linux delays that ACK ~40 ms. Acknowledge at once instead: a
+            # read returning rows went from ~44 ms to ~1 ms. (The flag resets itself, so it is set before each read.)
+            if _QUICKACK is not None:
+                self._sock.setsockopt(socket.IPPROTO_TCP, _QUICKACK, 1)
+            chunk = self._sock.recv(65536)
             if not chunk:
                 logger.debug("conn=%d connection closed by peer", self.conn_id)
                 return None
-            self._buf += chunk
-        line, _, self._buf = self._buf.partition(b"\n")
-        text = line.decode().rstrip("\r")
+            *complete, self._buf = (self._buf + chunk).split(b"\n")    # each byte is split once, not once per line
+            self._lines.extend(complete)
+        text = self._lines.popleft().decode().rstrip("\r")
         logger.info("conn=%d RESPONSE: %s", self.conn_id, text)
         return text
 
