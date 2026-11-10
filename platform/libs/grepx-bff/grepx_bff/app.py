@@ -34,6 +34,10 @@ def create_app(gw: Gateway, product_routers: Iterable[APIRouter], title: str, we
         finally:
             CURRENT_TRACE.reset(token)
         response.headers["X-Trace-Id"] = trace_id
+        if "cache-control" not in response.headers:
+            # The web app is many small modules: the browser must ask each time (an unchanged file is a cheap 304), so
+            # after an update it never mixes a new module with an old cached one - that leaves the app stuck on Loading.
+            response.headers["Cache-Control"] = "no-cache"
         response.headers.update({"X-Content-Type-Options": "nosniff", "X-Frame-Options": "SAMEORIGIN", "Referrer-Policy": "strict-origin-when-cross-origin"})
         return response
 
