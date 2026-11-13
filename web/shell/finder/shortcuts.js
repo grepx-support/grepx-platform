@@ -6,10 +6,12 @@
 
 // Keyboard shortcuts for the whole app. "g" then a letter jumps to the page whose route says key: "<letter>".
 import { visible } from "../session.js";
+import { pins } from "../pins.js";
 import { state } from "../state.js";
 
 export const SHORTCUTS = [[["Ctrl", "K"], "Search pages, actions and records"], [["/"], "Search too"],
-  [["G", "then a letter"], "Go to a page (the letter is shown in search)"], [["?"], "This list"], [["Esc"], "Close a dialog or search"]];
+  [["G", "then a letter"], "Go to a page (the letter is shown in search)"], [["Alt", "1-9"], "Open a pinned page (pin one with the star by its title)"],
+  [["?"], "This list"], [["Esc"], "Close a dialog or search"]];
 
 const typing = (e) => e.target.closest?.("input, textarea, select, [contenteditable=true]");
 
@@ -23,6 +25,11 @@ export class Shortcuts {
 
   key(e) {
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") { e.preventDefault(); return this.handlers.find(); }
+    if (e.altKey && !e.ctrlKey && !e.metaKey && /^Digit[1-9]$/.test(e.code)) {
+      const path = pins.read()[Number(e.code.slice(5)) - 1];
+      if (path) { e.preventDefault(); location.hash = `#${path}`; }
+      return;
+    }
     if (typing(e) || e.ctrlKey || e.metaKey || e.altKey) return;
     if (e.key === "/") { e.preventDefault(); return this.handlers.find(); }
     if (e.key === "?") { e.preventDefault(); return this.handlers.help(); }

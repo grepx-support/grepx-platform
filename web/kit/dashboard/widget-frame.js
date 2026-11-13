@@ -4,7 +4,8 @@
  * Unauthorised copying, use, modification or distribution is strictly prohibited.
  */
 
-// One dashboard tile: coloured header with icon and title, its body, and - while editing - grip, resize and hide.
+// One dashboard tile: coloured header with icon and title (a link to its page when the widget says `href`), its body,
+// and - while editing - grip, resize and hide.
 import { Component } from "../core/component.js";
 import { html } from "../core/dom.js";
 import { icon } from "../icons/icons.js";
@@ -18,7 +19,8 @@ export class WidgetFrame extends Component {
     return html`<section class="kit-widget size-${size}" data-id="${def.id}" style="--area:${def.area || "var(--accent)"}">
       <header class="kit-whead">
         ${editing ? html`<button type="button" class="kit-grip" aria-label="Move ${def.title} (arrow keys)">${icon("grip", { size: 16 })}</button>` : ""}
-        <span class="kit-wicon">${icon(def.icon)}</span><h3>${def.title}</h3>
+        <span class="kit-wicon">${icon(def.icon)}</span>${def.href && !editing
+          ? html`<h3><a href="${def.href}" class="kit-wlink">${def.title} ${icon("arrow", { size: 14 })}</a></h3>` : html`<h3>${def.title}</h3>`}
         ${editing ? html`<button type="button" class="kit-iconbtn small" data-grow title="Size: ${WIDTH[size]}" aria-label="Change size of ${def.title}">${icon("resize", { size: 15 })}</button>
           <button type="button" class="kit-iconbtn small" data-hide aria-label="Hide ${def.title}">${icon("eyeoff", { size: 15 })}</button>` : ""}
       </header><div class="kit-wbody"><div class="kit-skeleton"></div></div></section>`;

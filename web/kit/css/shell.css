@@ -118,3 +118,15 @@ kbd { display: inline-block; padding: 1px 6px; border-radius: 6px; border: 1px s
 .kit-photodrop { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 4px; color: var(--muted); pointer-events: none; text-align: center; }
 .kit-photo.has .kit-photodrop { display: none; }
 .kit-photozoom { display: flex; align-items: center; gap: 10px; width: 240px; color: var(--muted); } .kit-photozoom input { flex: 1; }
+/* pinned pages and folding groups */
+#nav button.group { display: flex; align-items: center; justify-content: space-between; width: calc(100% - 20px); background: none; border: 0; cursor: pointer;
+  font: inherit; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); padding: 0; }
+#nav button.group:hover { color: var(--ink-2); }
+#nav button.group svg { transition: transform .2s; } #nav button.group[aria-expanded="false"] svg { transform: rotate(-90deg); }
+#nav .group.pinned { display: flex; align-items: center; gap: 6px; color: #f59e0b; }
+#nav a kbd { position: absolute; right: 8px; font: 600 10px/1 inherit; background: var(--card); color: var(--muted); border: 1px solid var(--line); border-radius: 6px; padding: 3px 5px; opacity: 0; transition: opacity .15s; }
+#nav a:hover kbd, #nav a:focus-visible kbd { opacity: 1; }
+.top .crumb .pin { background: none; border: 0; cursor: pointer; color: var(--muted); display: grid; place-items: center; width: 30px; height: 30px; border-radius: 9px; transition: color .15s, transform .15s; }
+.top .crumb .pin:hover { color: #f59e0b; transform: scale(1.1); }
+.top .crumb .pin.on { color: #f59e0b; } .top .crumb .pin.on svg { fill: currentColor; }
+.kit-loadfail { background: color-mix(in srgb, var(--bad) 14%, var(--card)); color: var(--bad); font-weight: 600; }

@@ -8,8 +8,11 @@
 // the dashboard. HTML5 drag events do not work on phones, so this follows the pointer itself:
 //   - press on a `handle` element inside `root` and move a few pixels -> a floating copy follows the pointer;
 //   - the `target` element under the pointer gets .kit-over (hooks: over(drag), drop(drag), cancel(drag));
-//   - on touch screens a drag starts only from a .kit-grip (so the page still scrolls with a finger).
+//   - on touch screens a drag starts only from a .kit-grip (so the page still scrolls with a finger);
+//   - the copy moves once per frame; on drop it flies to `drag.landAt` (an element a listener sets), on cancel back home;
+//   - near the edge of the window or of a scrolling box under the pointer, that one scrolls by itself.
 import { Emitter } from "../core/emitter.js";
+import { land, scroller } from "./motion.js";
 
 const IGNORE = "input, textarea, select, button:not(.kit-grip), a, [contenteditable], .kit-nodrag";
 const EDGE = 48;           // px from the window edge where the page scrolls by itself while dragging
@@ -47,7 +50,13 @@ export class DragController extends Emitter {
       this.begin(d);
     }
     e.preventDefault();
-    d.ghost.style.transform = `translate(${d.x - d.offsetX}px, ${d.y - d.offsetY}px) rotate(1.5deg)`;
+    if (!d.frame) d.frame = requestAnimationFrame(() => this.paint(d));
+  }
+
+  paint(d) {
+    d.frame = 0;
+    if (this.drag !== d) return;
+    d.ghost.style.transform = `translate3d(${d.x - d.offsetX}px, ${d.y - d.offsetY}px, 0) rotate(2deg) scale(1.03)`;
     this.hover(d);
     this.autoscroll(d);
   }
@@ -58,7 +67,8 @@ export class DragController extends Emitter {
     d.offsetX = d.startX - box.left; d.offsetY = d.startY - box.top;
     d.ghost = d.source.cloneNode(true);
     d.ghost.classList.add("kit-ghost");
-    Object.assign(d.ghost.style, { width: `${box.width}px`, height: `${box.height}px` });
+    Object.assign(d.ghost.style, { width: `${box.width}px`, height: `${box.height}px`, transform: `translate3d(${box.left}px, ${box.top}px, 0)` });
+    d.size = { width: box.width, height: box.height };
     document.body.append(d.ghost);
     d.source.classList.add("kit-dragging");
     document.body.classList.add("kit-drag-active");
@@ -80,6 +90,12 @@ export class DragController extends Emitter {
   }
 
   autoscroll(d) {
+    const box = scroller(d.under);
+    if (box) {
+      const r = box.getBoundingClientRect();
+      if (d.y < r.top + EDGE) box.scrollTop -= 10;
+      else if (d.y > r.bottom - EDGE) box.scrollTop += 10;
+    }
     if (d.y < EDGE) window.scrollBy(0, -12);
     else if (d.y > innerHeight - EDGE) window.scrollBy(0, 12);
   }
@@ -97,12 +113,14 @@ export class DragController extends Emitter {
     window.removeEventListener("pointercancel", this.up);
     window.removeEventListener("keydown", this.key);
     if (!d?.started) return;
-    d.ghost.remove();
+    cancelAnimationFrame(d.frame);
     d.source.classList.remove("kit-dragging");
     d.over?.classList.remove("kit-over");
     document.body.classList.remove("kit-drag-active");
-    this.emit(dropped && d.over ? "drop" : "cancel", d);
+    const kind = dropped && d.over ? "drop" : "cancel";
+    this.emit(kind, d);
     this.emit("end", d);
+    land(d.ghost, kind === "drop" ? d.landAt : d.source);
   }
 
   destroy() {

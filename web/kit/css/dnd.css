@@ -77,3 +77,20 @@ body.kit-drag-active, body.kit-drag-active * { cursor: grabbing !important; user
   .kit-bline { grid-template-columns: 1fr auto; } .kit-unit { display: none; }
   .kit-phead { flex-wrap: wrap; } .kit-pactions { margin-left: 0; width: 100%; justify-content: flex-start; }
 }
+
+/* smooth drag: a lifted copy, a gap where it will land, a soft landing */
+.kit-ghost { will-change: transform; box-shadow: 0 24px 50px -16px rgba(15, 23, 42, .45), 0 0 0 2px color-mix(in srgb, var(--area, var(--primary)) 50%, transparent); }
+.kit-dragging { opacity: .25; filter: saturate(.4); transition: opacity .15s; }
+.kit-kgap { border: 2px dashed color-mix(in srgb, var(--area) 55%, transparent); border-radius: 14px; background: color-mix(in srgb, var(--area) 8%, transparent);
+  animation: kit-gap .18s ease-out; }
+@keyframes kit-gap { from { opacity: 0; transform: scaleY(.6); } }
+.kit-landing { visibility: hidden; }
+.kit-landed { animation: kit-land .45s cubic-bezier(.2,.8,.2,1); }
+@keyframes kit-land { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--area, var(--primary)) 60%, transparent); } 100% { box-shadow: 0 0 0 14px transparent; } }
+.kit-kcard { transition: transform .15s, box-shadow .15s, border-color .15s; }
+.kit-kcard:hover { transform: translateY(-1px); box-shadow: var(--shadow-lg); }
+
+/* a board fits the screen: each column scrolls inside itself */
+.kit-kcol { max-height: calc(100vh - var(--board-top, 210px)); min-height: 260px; }
+.kit-klist { overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; padding: 2px 2px 6px; margin: 0 -2px; }
+@media (max-width: 760px) { .kit-kcol { max-height: none; } }

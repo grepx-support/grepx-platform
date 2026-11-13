@@ -11,8 +11,9 @@ import { linear, niceMax, short, ticks } from "./scale.js";
 
 const W = 640, H = 220, PAD = { l: 40, r: 12, t: 12, b: 26 };
 
-/** lineChart({ labels: [...], series: [{name, color, values: [...]}], band: [lo, hi], unit: "%", max }) -> Raw */
-export function lineChart({ labels, series, band = null, unit = "", max = null, label = "Line chart" }) {
+/** lineChart({ labels: [...], series: [{name, color, values: [...]}], band: [lo, hi], unit: "%", max, links: [href per label] }) -> Raw
+ *  With links, each day / label is a clickable column that opens its page. */
+export function lineChart({ labels, series, band = null, unit = "", max = null, label = "Line chart", links = null }) {
   const all = series.flatMap((s) => s.values).concat(band || []);
   const top = max ?? niceMax(all, 1);
   const x = linear([0, Math.max(1, labels.length - 1)], [PAD.l, W - PAD.r]);
@@ -23,8 +24,20 @@ export function lineChart({ labels, series, band = null, unit = "", max = null, 
   const xs = labels.map((l, i) => (i % every ? "" : `<text x="${x(i)}" y="${H - 6}" class="kit-axis" text-anchor="middle">${String(l).replace(/[<&]/g, "")}</text>`)).join("");
   const bandRect = band ? `<rect x="${PAD.l}" width="${W - PAD.l - PAD.r}" y="${y(band[1])}" height="${y(band[0]) - y(band[1])}" class="kit-band"/>` : "";
   const lines = series.map((s, n) => path(s, n, x, y, labels, unit)).join("");
-  return html`<figure class="kit-chart"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${label}">
-    ${raw(bandRect + grid + xs + lines)}</svg>${series.length > 1 ? legend(series) : ""}</figure>`;
+  const hits = links ? hitColumns(labels, links, x, series, unit) : "";
+  return html`<figure class="kit-chart${links ? " linked" : ""}"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${label}">
+    ${raw(bandRect + grid + xs + lines + hits)}</svg>${series.length > 1 ? legend(series) : ""}</figure>`;
+}
+
+/** One see-through column per label that links to its page (title: the label and every series' value). */
+function hitColumns(labels, links, x, series, unit) {
+  const step = (W - PAD.l - PAD.r) / Math.max(1, labels.length - 1);
+  return labels.map((l, i) => {
+    if (!links[i]) return "";
+    const tip = [String(l), ...series.map((s) => `${s.name || ""}: ${s.values[i] == null ? "-" : short(s.values[i]) + unit}`)].join("\n").replace(/[<&"]/g, "");
+    const left = Math.max(PAD.l, x(i) - step / 2), right = Math.min(W - PAD.r, x(i) + step / 2);
+    return `<a href="${String(links[i]).replace(/"/g, "")}" class="kit-hit"><rect x="${left.toFixed(1)}" y="${PAD.t}" width="${(right - left).toFixed(1)}" height="${H - PAD.t - PAD.b}"><title>${tip}</title></rect></a>`;
+  }).join("");
 }
 
 let uid = 0;

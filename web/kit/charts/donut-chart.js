@@ -8,7 +8,7 @@
 import { html, raw } from "../core/dom.js";
 import { short } from "./scale.js";
 
-/** donut({ parts: [{label, value, color}], centre: "62%", caption: "COGS" }) -> Raw */
+/** donut({ parts: [{label, value, color, href?}], centre: "62%", caption: "COGS" }) -> Raw (a part with href opens that page) */
 export function donut({ parts, centre = "", caption = "", label = "Donut chart" }) {
   const total = parts.reduce((a, p) => a + Math.max(0, p.value || 0), 0);
   const R = 42, C = 2 * Math.PI * R;
@@ -17,11 +17,15 @@ export function donut({ parts, centre = "", caption = "", label = "Donut chart" 
     const len = (p.value / total) * C;
     const arc = `<circle r="${R}" cx="60" cy="60" fill="none" stroke="${p.color}" stroke-width="16" stroke-dasharray="${len.toFixed(2)} ${(C - len).toFixed(2)}"
       stroke-dashoffset="${(-at).toFixed(2)}" transform="rotate(-90 60 60)"><title>${String(p.label).replace(/[<&]/g, "")}: ${short(p.value)}</title></circle>`;
+    const linked = p.href ? `<a href="${String(p.href).replace(/"/g, "")}" class="kit-hit">${arc}</a>` : arc;
     at += len;
-    return arc;
+    return linked;
   }).join("") : `<circle r="${R}" cx="60" cy="60" fill="none" class="kit-track" stroke-width="16"/>`;
   return html`<figure class="kit-donut"><svg viewBox="0 0 120 120" role="img" aria-label="${label}">${raw(arcs)}
       <text x="60" y="58" text-anchor="middle" class="kit-donut-value">${centre}</text>
       <text x="60" y="74" text-anchor="middle" class="kit-axis">${caption}</text></svg>
-    <figcaption class="kit-legend column">${parts.map((p) => html`<span><i style="background:${p.color}"></i>${p.label}<b>${short(p.value || 0)}</b></span>`)}</figcaption></figure>`;
+    <figcaption class="kit-legend column">${parts.map((p) => {
+      const inner = html`<i style="background:${p.color}"></i>${p.label}<b>${short(p.value || 0)}</b>`;
+      return p.href ? html`<a href="${p.href}">${inner}</a>` : html`<span>${inner}</span>`;
+    })}</figcaption></figure>`;
 }

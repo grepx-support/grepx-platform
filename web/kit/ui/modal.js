@@ -9,9 +9,9 @@ import { h, html, raw } from "../core/dom.js";
 import { icon } from "../icons/icons.js";
 
 /** openDialog({ title, body: markup|Element, actions: [{label, value, primary, danger}] }) -> Promise<value | null> */
-export function openDialog({ title, body, actions = [{ label: "Close", value: null }] }) {
+export function openDialog({ title, body, actions = [{ label: "Close", value: null }], wide = false }) {
   return new Promise((resolve) => {
-    const dlg = h("dialog", { class: "kit-dialog" });
+    const dlg = h("dialog", { class: `kit-dialog${wide ? " wide" : ""}` });
     dlg.innerHTML = html`<form method="dialog"><header><h2>${title}</h2><button value="" class="kit-iconbtn" aria-label="Close">${icon("x")}</button></header>
       <div class="kit-dbody"></div><footer>${actions.map((a) => html`<button class="btn ${a.primary ? "primary" : ""} ${a.danger ? "danger" : ""}"
         value="${a.value ?? ""}">${a.label}</button>`)}</footer></form>`.text;

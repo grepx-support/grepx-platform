@@ -4,7 +4,8 @@
  * Unauthorised copying, use, modification or distribution is strictly prohibited.
  */
 
-// A table with click-to-sort headers and a quick filter box; columns decide how a cell looks.
+// A table with click-to-sort headers, a quick filter box and pages (25 / 50 / 100 / all rows); columns decide how a cell
+// looks. It scrolls inside itself with the header kept, so a long table never makes the whole page long.
 import { Component } from "../core/component.js";
 import { html, raw } from "../core/dom.js";
 import { icon } from "../icons/icons.js";
@@ -13,8 +14,8 @@ export class DataTable extends Component {
   /** props: { columns: [{key, label, render?(row) -> markup, sort?: false, align?: "end", value?(row)}],
    *           rows, filter: true, empty, pageSize } */
   constructor(props) {
-    super({ filter: true, pageSize: 200, empty: "Nothing yet.", ...props });
-    this.by = null; this.desc = false; this.query = "";
+    super({ filter: true, pageSize: 50, empty: "Nothing yet.", ...props });
+    this.by = null; this.desc = false; this.query = ""; this.page = 0; this.size = this.props.pageSize;
   }
 
   value(col, row) { return col.value ? col.value(row) : row[col.key]; }
@@ -30,7 +31,18 @@ export class DataTable extends Component {
         return this.desc ? -n : n;
       });
     }
-    return rows.slice(0, this.props.pageSize);
+    this.total = rows.length;
+    this.page = Math.min(this.page, Math.max(0, Math.ceil(rows.length / this.size) - 1));
+    return this.size ? rows.slice(this.page * this.size, (this.page + 1) * this.size) : rows;
+  }
+
+  pager() {
+    if (this.total <= 25) return "";
+    const from = this.page * this.size + 1, to = this.size ? Math.min(this.total, (this.page + 1) * this.size) : this.total;
+    return html`<div class="kit-pager"><span>${from}-${to} of ${this.total}</span>
+      <button type="button" class="btn small" data-page="-1" ${this.page ? "" : "disabled"} aria-label="Previous page">‹</button>
+      <button type="button" class="btn small" data-page="1" ${to < this.total ? "" : "disabled"} aria-label="Next page">›</button>
+      <select data-size aria-label="Rows per page">${[25, 50, 100, 0].map((n) => html`<option value="${n}" ${n === this.size ? "selected" : ""}>${n ? `${n} rows` : "All rows"}</option>`)}</select></div>`;
   }
 
   render() {
@@ -41,7 +53,7 @@ export class DataTable extends Component {
       <div class="kit-scroll"><table><thead><tr>${columns.map((c) => html`<th class="${c.align === "end" ? "end" : ""}">${c.sort === false ? c.label
         : html`<button type="button" data-sort="${c.key}" class="kit-sort ${this.by === c.key ? (this.desc ? "desc" : "asc") : ""}">${c.label}</button>`}</th>`)}</tr></thead>
       <tbody>${rows.length ? rows.map((r) => html`<tr>${columns.map((c) => html`<td class="${c.align === "end" ? "end" : ""}">${c.render ? raw(c.render(r)) : r[c.key] ?? ""}</td>`)}</tr>`)
-        : html`<tr><td colspan="${columns.length}" class="muted">${empty}</td></tr>`}</tbody></table></div></div>`;
+        : html`<tr><td colspan="${columns.length}" class="muted">${empty}</td></tr>`}</tbody></table></div>${this.pager()}</div>`;
   }
 
   mounted() {
@@ -50,7 +62,10 @@ export class DataTable extends Component {
       this.by = b.dataset.sort;
       this.update();
     });
+    this.el.querySelectorAll("[data-page]").forEach((b) => b.onclick = () => { this.page += Number(b.dataset.page); this.update(); });
+    const size = this.el.querySelector("[data-size]");
+    if (size) size.onchange = () => { this.size = Number(size.value); this.page = 0; this.update(); };
     const input = this.el.querySelector("input[type=search]");
-    if (input) input.oninput = () => { this.query = input.value; this.update(); const i = this.el.querySelector("input[type=search]"); i.focus(); i.setSelectionRange(i.value.length, i.value.length); };
+    if (input) input.oninput = () => { this.query = input.value; this.page = 0; this.update(); const i = this.el.querySelector("input[type=search]"); i.focus(); i.setSelectionRange(i.value.length, i.value.length); };
   }
 }

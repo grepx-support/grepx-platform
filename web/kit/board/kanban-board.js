@@ -7,6 +7,8 @@
 // A board of columns with cards that move between them by drag and drop (or the card's "Move to" menu).
 // The page decides what a move means: onMove(card, from, to) does the real work and returns true when it worked;
 // the card moves at once and goes back if the move fails. A column's accepts(card, from) can refuse a drop.
+// While dragging, a gap the size of the card opens in a column that takes it; the card lands there smoothly.
+// Columns keep the height of the screen and scroll inside; clicking a card (not dragging it) calls onOpen(card).
 import { Component } from "../core/component.js";
 import { html, raw } from "../core/dom.js";
 import { icon } from "../icons/icons.js";
@@ -14,7 +16,7 @@ import { DragController } from "../dnd/drag-controller.js";
 
 export class KanbanBoard extends Component {
   /** props: { columns: [{id, title, icon, color, accepts?(card, from), hint}], cards: [{id, column, ...}],
-   *           card(card) -> markup, onMove(card, from, to) -> Promise<boolean>, empty: text } */
+   *           card(card) -> markup, onMove(card, from, to) -> Promise<boolean>, onOpen?(card, element), empty: text } */
   render() {
     const { columns, cards, empty = "Nothing here" } = this.props;
     return html`<div class="kit-board" style="--cols:${columns.length}">${columns.map((col) => {
@@ -39,9 +41,17 @@ export class KanbanBoard extends Component {
 
   mounted() {
     const drag = new DragController(this.el, { handle: ".kit-kcard", target: ".kit-kcol", scope: this.el });
-    drag.on("over", (d) => this.mark(d));
-    drag.on("drop", (d) => this.move(d.source.dataset.id, d.over.dataset.col));
-    drag.on("end", () => this.el.querySelectorAll(".kit-refuse").forEach((c) => c.classList.remove("kit-refuse")));
+    drag.on("over", (d) => { this.mark(d); this.gap(d); });
+    drag.on("drop", (d) => { this.move(d.source.dataset.id, d.over.dataset.col); d.landAt = this.el.querySelector(`[data-id="${CSS.escape(d.source.dataset.id)}"]`); });
+    drag.on("end", () => {
+      this.el.querySelectorAll(".kit-refuse").forEach((c) => c.classList.remove("kit-refuse"));
+      this.el.querySelectorAll(".kit-kgap").forEach((g) => g.remove());
+    });
+    this.el.addEventListener("click", (e) => {
+      const box = e.target.closest(".kit-kcard");
+      if (!box || !this.props.onOpen || e.target.closest("a, select, button, input, label")) return;
+      this.props.onOpen(this.props.cards.find((c) => c.id === box.dataset.id), box);
+    });
     this.onCleanup(() => drag.destroy());
     this.el.querySelectorAll("[data-move]").forEach((sel) => sel.onchange = () => sel.value && this.move(sel.closest(".kit-kcard").dataset.id, sel.value));
   }
@@ -51,6 +61,19 @@ export class KanbanBoard extends Component {
   allowed(card, to) {
     const col = this.column(to);
     return !!col && to !== card.column && (!col.accepts || col.accepts(card, card.column));
+  }
+
+  /** A dashed gap the size of the card at the end of the column under the pointer, when that column takes it. */
+  gap(d) {
+    const card = this.props.cards.find((c) => c.id === d.source.dataset.id);
+    const col = d.over && this.allowed(card, d.over.dataset.col) ? d.over : null;
+    this.el.querySelectorAll(".kit-kgap").forEach((g) => { if (g.parentElement.closest(".kit-kcol") !== col) g.remove(); });
+    if (col && !col.querySelector(".kit-kgap")) {
+      const g = document.createElement("div");
+      g.className = "kit-kgap";
+      g.style.height = `${d.size.height}px`;
+      col.querySelector(".kit-klist").append(g);
+    }
   }
 
   mark(d) {

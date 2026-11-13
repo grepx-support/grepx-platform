@@ -72,6 +72,8 @@ const ICONS = {
   download: "M12 4v12M7 11l5 5 5-5M4 20h16",
   command: "M9 6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3z",
   expand: "M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5",
+  star: "M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z",
+  chevron: "M6 9l6 6 6-6",
 };
 
 export function registerIcons(more) { Object.assign(ICONS, more); }

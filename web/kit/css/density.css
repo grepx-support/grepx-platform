@@ -1,0 +1,77 @@
+/*
+ * Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+ * This file is part of the GrepX platform and is proprietary and confidential.
+ * Unauthorised copying, use, modification or distribution is strictly prohibited.
+ */
+
+/* Enterprise density: pages use the full width of the screen, with tighter spacing, compact headers, side-by-side
+   KPI tiles and denser tables - more on screen, less scrolling. Loaded last, so it only adjusts sizes; colours and
+   behaviour stay in the other sheets. Phones keep their own comfortable spacing (the @media blocks there). */
+:root { --side: 228px; --radius: 12px; --radius-sm: 8px; }
+
+/* page frame */
+.wrap { max-width: none; padding: 14px 20px 36px; }
+.top { padding: 6px 20px; gap: 10px; min-height: 52px; }
+.side { padding: 12px 10px; gap: 10px; }
+.brand { font-size: 15px; }
+#nav { gap: 1px; }
+#nav .group, #nav button.group { margin: 8px 8px 2px; }
+#nav a { padding: 5px 8px; gap: 9px; border-radius: 9px; font-size: 14px; }
+#nav a .ni { width: 26px; height: 26px; border-radius: 8px; }
+#nav a.on::before { left: -10px; top: 6px; bottom: 6px; }
+
+/* page header: one compact line */
+.kit-phead { gap: 12px; margin: 0 0 12px; }
+.kit-phead h1 { font-size: 1.32rem; }
+.kit-phead p { font-size: 13.5px; margin: 0; }
+.kit-picon { width: 40px; height: 40px; border-radius: 12px; }
+.kit-picon svg { width: 20px; height: 20px; }
+h2 { font-size: 1rem; margin: 0 0 .55em; }
+
+/* cards and sections */
+.card { padding: 14px; }
+.k-section { margin-bottom: 12px; }
+.hero { padding: 18px 20px; margin-bottom: 12px; border-radius: 16px; }
+
+/* KPI tiles: icon beside the number, half the height */
+.kit-kpis { gap: 10px; margin-bottom: 12px; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+.kit-kpi { grid-template-columns: auto 1fr; grid-template-rows: auto auto; column-gap: 12px; row-gap: 0; padding: 10px 12px; align-items: center; }
+.kit-kpi-icon { grid-row: 1 / span 2; width: 34px; height: 34px; margin: 0; border-radius: 10px; }
+.kit-kpi-label { font-size: 12px; align-self: end; }
+.kit-kpi-value { font-size: 1.3rem; line-height: 1.2; align-self: start; }
+.kit-kpi-note, .kit-kpi svg { grid-column: 1 / -1; }
+.kit-kpi::after { width: 90px; height: 90px; }
+
+/* tables: more rows on screen, header stays visible */
+th, td { padding: 6px 8px; font-size: 13.5px; }
+thead th { position: sticky; top: 0; z-index: 1; background: var(--card); }
+tbody tr:hover td { background: color-mix(in srgb, var(--primary) 5%, transparent); }
+
+/* controls */
+.btn { padding: 7px 12px; border-radius: 10px; font-size: 13.5px; }
+.btn.small { padding: 4px 9px; font-size: 12.5px; border-radius: 8px; }
+input, select, textarea { padding: 7px 10px; border-radius: 10px; }
+.kit-tabs { margin: 0 0 12px; padding: 3px; border-radius: 12px; }
+.kit-tabs a { padding: 5px 10px; font-size: 13.5px; border-radius: 9px; }
+.kit-chip { padding: 3px 9px; font-size: 12px; }
+.kit-steps { margin-bottom: 12px; }
+.kit-empty { padding: 18px 12px; }
+
+/* wide screens: two sections side by side where a page asks for it */
+.kit-cols { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(520px, 1fr)); align-items: start; }
+.kit-cols > .card { margin: 0; }
+
+@media (max-width: 760px) {
+  .wrap { padding: 12px 10px 64px; }
+  .top { padding: 6px 10px; }
+  .kit-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .kit-cols { grid-template-columns: 1fr; }
+}
+
+/* bar lists (stock levels and the like): one tight line per row */
+.kit-bars { gap: 7px; }
+.kit-bar { height: 6px; margin-top: 3px; }
+.grid { gap: 12px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+
+/* long lists inside cards scroll inside the card, so a page with many places or items stays one screen */
+.grid > .card .kit-bars, .k-scroll { max-height: min(62vh, 720px); overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; padding-right: 4px; }

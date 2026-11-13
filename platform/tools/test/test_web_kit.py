@@ -31,7 +31,8 @@ def code_lines(path: Path):
 
 @pytest.mark.skipif(shutil.which("node") is None, reason="node is not installed")
 def test_kit_unit_tests_pass():
-    out = subprocess.run(["node", "--test", str(KIT / "test" / "kit.test.mjs")], capture_output=True, text=True, timeout=120)
+    files = [str(f) for f in sorted([*(KIT / "test").glob("*.test.mjs"), *(SHELL / "test").glob("*.test.mjs")])]
+    out = subprocess.run(["node", "--test", *files], capture_output=True, text=True, timeout=120)
     assert out.returncode == 0, out.stdout[-2000:] + out.stderr[-2000:]
 
 

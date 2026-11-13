@@ -1,0 +1,60 @@
+/*
+ * Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+ * This file is part of the GrepX platform and is proprietary and confidential.
+ * Unauthorised copying, use, modification or distribution is strictly prohibited.
+ */
+
+/* The assistant: a glowing button, a glass panel, colourful answers. */
+.as-root { position: fixed; right: 20px; bottom: 20px; z-index: 70; }
+.as-fab { width: 58px; height: 58px; border-radius: 50%; border: 0; cursor: pointer; color: #fff; display: grid; place-items: center;
+  background: conic-gradient(from var(--as-spin, 0deg), #f97316, #ec4899, #8b5cf6, #22d3ee, #f97316); box-shadow: 0 14px 34px -10px rgba(139, 92, 246, .7);
+  animation: as-spin 6s linear infinite; transition: transform .2s; position: relative; }
+.as-fab::after { content: ""; position: absolute; inset: 4px; border-radius: 50%; background: linear-gradient(135deg, #7c3aed, #db2777); z-index: 0; }
+.as-fab svg { position: relative; z-index: 1; filter: drop-shadow(0 1px 2px rgba(0,0,0,.3)); }
+.as-fab:hover { transform: scale(1.08) rotate(-6deg); }
+.as-root.open .as-fab { transform: scale(.9); opacity: .9; }
+@property --as-spin { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+@keyframes as-spin { to { --as-spin: 360deg; } }
+.as-panel { position: absolute; right: 0; bottom: 72px; width: min(420px, calc(100vw - 32px)); height: min(640px, calc(100vh - 120px)); display: flex; flex-direction: column;
+  border-radius: 22px; overflow: hidden; background: color-mix(in srgb, var(--card) 88%, transparent); backdrop-filter: blur(18px) saturate(1.5);
+  border: 1px solid color-mix(in srgb, #8b5cf6 25%, var(--line)); box-shadow: 0 30px 80px -24px rgba(76, 29, 149, .55); transform-origin: bottom right; animation: as-pop .22s cubic-bezier(.2,.8,.2,1); }
+@keyframes as-pop { from { opacity: 0; transform: translateY(12px) scale(.96); } }
+.as-panel > header { display: flex; align-items: center; gap: 10px; padding: 12px 12px 12px 14px; color: #fff; background: linear-gradient(120deg, #7c3aed, #db2777 60%, #f97316); }
+.as-panel > header div { flex: 1; display: grid; } .as-panel > header small { opacity: .85; font-size: 12px; }
+.as-panel > header .kit-iconbtn { color: #fff; background: rgba(255,255,255,.14); border-color: transparent; }
+.as-av { width: 34px; height: 34px; border-radius: 12px; display: grid; place-items: center; background: rgba(255,255,255,.2); }
+.as-log { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; overscroll-behavior: contain; scroll-behavior: smooth; }
+.as-me { align-self: flex-end; max-width: 82%; padding: 9px 13px; border-radius: 16px 16px 4px 16px; color: #fff; background: linear-gradient(135deg, #7c3aed, #6366f1); font-size: 14px; animation: as-in .2s ease-out; }
+.as-reply { align-self: flex-start; max-width: 94%; padding: 11px 13px; border-radius: 16px 16px 16px 4px; background: var(--card); border: 1px solid var(--line); box-shadow: var(--shadow);
+  font-size: 14px; display: grid; gap: 9px; animation: as-in .25s ease-out; }
+.as-reply.bad { border-color: color-mix(in srgb, var(--bad) 40%, var(--line)); }
+.as-reply p { margin: 0; line-height: 1.45; }
+@keyframes as-in { from { opacity: 0; transform: translateY(6px); } }
+.as-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 6px; }
+.as-kpi { display: grid; padding: 7px 9px; border-radius: 12px; color: inherit; background: linear-gradient(135deg, color-mix(in srgb, #8b5cf6 10%, var(--card)), color-mix(in srgb, #22d3ee 8%, var(--card))); }
+.as-kpi small { font-size: 11px; color: var(--muted); } .as-kpi b { font-size: 15px; }
+.as-kpi.bad b { color: var(--bad); } .as-kpi.good b { color: var(--good); } .as-kpi.warn b { color: #d97706; }
+a.as-kpi:hover { outline: 2px solid color-mix(in srgb, #8b5cf6 40%, transparent); }
+.as-items { display: grid; gap: 2px; max-height: 260px; overflow-y: auto; }
+.as-row { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 10px; color: inherit; background: none; border: 0; text-align: left; font: inherit; width: 100%; }
+a.as-row:hover, button.as-row:hover { background: color-mix(in srgb, #8b5cf6 9%, transparent); cursor: pointer; }
+.as-it { flex: 1; display: grid; min-width: 0; } .as-it small { color: var(--muted); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.as-row em { font-style: normal; font-weight: 700; font-size: 13px; white-space: nowrap; }
+.as-row em.bad { color: var(--bad); } .as-row em.good { color: var(--good); } .as-row em.warn { color: #d97706; }
+.as-row svg { color: var(--muted); flex: none; }
+.as-links { display: flex; flex-wrap: wrap; gap: 6px; } .as-link { font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
+.as-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.as-chips button { border: 1px solid color-mix(in srgb, #8b5cf6 35%, var(--line)); background: color-mix(in srgb, #8b5cf6 7%, var(--card)); color: inherit;
+  border-radius: 999px; padding: 5px 11px; font: 600 12.5px var(--font); cursor: pointer; transition: transform .12s, background .12s; }
+.as-chips button:hover { transform: translateY(-1px); background: color-mix(in srgb, #8b5cf6 16%, var(--card)); }
+.as-cached { justify-self: end; color: var(--muted); font-size: 11px; display: inline-flex; align-items: center; gap: 3px; }
+.as-typing { align-self: flex-start; display: flex; gap: 4px; padding: 12px 14px; border-radius: 16px; background: var(--card); border: 1px solid var(--line); }
+.as-typing i { width: 7px; height: 7px; border-radius: 50%; background: #8b5cf6; animation: as-dot 1s infinite ease-in-out; }
+.as-typing i:nth-child(2) { animation-delay: .15s; background: #ec4899; } .as-typing i:nth-child(3) { animation-delay: .3s; background: #f97316; }
+@keyframes as-dot { 0%, 80%, 100% { transform: translateY(0); opacity: .5; } 40% { transform: translateY(-5px); opacity: 1; } }
+.as-ask { display: flex; gap: 8px; padding: 10px; border-top: 1px solid var(--line); background: var(--card); }
+.as-ask input { flex: 1; border-radius: 999px; padding: 9px 14px; }
+.as-send { width: 40px; height: 40px; border-radius: 50%; border: 0; color: #fff; cursor: pointer; display: grid; place-items: center; background: linear-gradient(135deg, #7c3aed, #db2777); }
+@media (max-width: 760px) { .as-root { right: 12px; bottom: 12px; } .as-panel { position: fixed; inset: auto 8px 82px 8px; width: auto; height: calc(100vh - 110px); } }
+@media (prefers-reduced-motion: reduce) { .as-fab { animation: none; } }
+.as-old { animation: none !important; }

@@ -13,6 +13,8 @@ import { renderNav } from "./shell/nav.js";
 import { route } from "./shell/router.js";
 import { can, loadMe, login, logout, onSessionChange } from "./shell/session.js";
 import { state } from "./shell/state.js";
+import { startAssistant } from "./shell/assistant/index.js";
+import { startExpand } from "./shell/expand.js";
 import { startFinder } from "./shell/finder/index.js";
 import { enterSupport, exitSupport, supportBanner } from "./shell/support.js";
 import { toast } from "./shell/toast.js";
@@ -42,15 +44,35 @@ function frame() {
   document.querySelector(".scrim").onclick = open;
 }
 
+/** An optional part that fails to start is reported, never allowed to stop the app. */
+function safely(what, start) {
+  try { start(); } catch (e) { console.error(`${what} did not start`, e); }
+}
+
+function moduleBanner(names) {
+  const bar = document.createElement("div");
+  bar.className = "support-bar kit-loadfail";
+  bar.setAttribute("role", "alert");
+  bar.textContent = `Some parts of the app could not load (${names.join(", ")}). The rest works - ask your administrator to update the server.`;
+  document.querySelector(".main")?.prepend(bar);
+}
+
 async function boot() {
   theme.apply();
   state.product = await (await fetch("/product.json")).json();
   brand(state.product);
   frame();
-  // All modules download at once (not one after another); routes keep product.json's order.
-  const modules = await Promise.all(state.product.modules.map((name) => import(`/assets/modules/${name}.js`)));
-  modules.forEach((mod) => state.routes.push(...mod.routes));
-  startFinder(modules, store, document.querySelector("#find"));
+  // All modules download at once (not one after another); routes keep product.json's order. One module that fails to
+  // load (an old or missing file on the server) never blanks the app: the rest works and a banner names what failed.
+  const tries = await Promise.allSettled(state.product.modules.map((name) => import(`/assets/modules/${name}.js`)));
+  const modules = tries.filter((t) => t.status === "fulfilled").map((t) => t.value);
+  const failed = state.product.modules.filter((name, i) => tries[i].status === "rejected");
+  failed.forEach((name, i) => console.error(`module ${name} did not load`, tries.filter((t) => t.status === "rejected")[i].reason));
+  if (failed.length) moduleBanner(failed);
+  modules.forEach((mod) => state.routes.push(...(mod.routes || [])));
+  safely("search", () => startFinder(modules, store, document.querySelector("#find")));
+  safely("chart expand", () => startExpand());
+  safely("assistant", () => startAssistant(modules));
   onSessionChange(renderNav);
   onSessionChange(supportBanner);
   onUnauthorized(async () => { if (!(await exitSupport())) logout(); });   // an expired support session goes back, not out
