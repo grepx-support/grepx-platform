@@ -74,3 +74,34 @@ test("a basket keeps its defaults when a setting is passed as undefined (builder
   const lot = new Basket({ lines: [{ item_id: "a", qty: 2, expiry: "2026-01-01" }], extras: [{ name: "expiry", label: "Expiry", type: "date" }] });
   assert.deepEqual(lot.lines(), [{ item_id: "a", qty: 2, expiry: "2026-01-01" }]);
 });
+
+test("square crop: the picture always covers the square, zoom keeps the centre", async () => {
+  const { SquareCrop } = await import("../profile/crop.js");
+  const c = new SquareCrop(800, 400, 200);            // wide picture: height fills the square
+  assert.equal(c.scale, 0.5);
+  assert.deepEqual(c.source(), [200, 0, 400]);       // centred
+  c.pan(1000, 0);                                    // dragged too far right: stops at the left edge
+  assert.deepEqual(c.source(), [0, 0, 400]);
+  c.centre(); c.setZoom(2);
+  assert.deepEqual(c.source(), [300, 100, 200]);     // twice as close, same centre
+  c.setZoom(10);
+  assert.equal(c.zoom, 4);
+});
+
+test("finder ranking: whole words and starts first, scattered letters last, misses dropped", async () => {
+  const { rank, score } = await import("../../shell/finder/score.js");
+  assert.equal(score("", "anything"), 1);
+  assert.equal(score("xyz", "Chicken"), 0);
+  const titles = rank("chi", [{ title: "Guajillo chilli" }, { title: "Kitchen" }, { title: "Chicken thigh" }, { title: "Beef chuck" }]).map((r) => r.title);
+  assert.deepEqual(titles, ["Chicken thigh", "Guajillo chilli"]);
+  assert.deepEqual(rank("rcv", [{ title: "Receive stock" }, { title: "Orders" }]).map((r) => r.title), ["Receive stock"]);
+});
+
+test("avatar: initials, a stable colour per name, the photo when there is one", async () => {
+  const { avatar, hue, initials } = await import("../profile/avatar.js");
+  assert.equal(initials("Olivia Owner"), "OO");
+  assert.equal(initials("kim@demo-taco.test"), "KD");
+  assert.deepEqual(hue("Olivia Owner"), hue("Olivia Owner"));
+  assert.match(String(avatar("Olivia", { photo: "abc" })), /src="\/api\/v1\/media\/abc"/);
+  assert.match(String(avatar("Olivia")), /<b>O<\/b>/);
+});

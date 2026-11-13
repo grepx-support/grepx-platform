@@ -7,12 +7,13 @@
 // Shared web shell for every GrepX product. A product = product.json (brand, colours, areas, modules); modules live in
 // modules/core (all products) and the product's own folder. This file only wires the parts together and starts the app;
 // each part is its own file under shell/ (state, api, session, nav, router, toast) and the UI kit is under kit/.
-import { esc, LocalStore, Theme, ThemeToggle } from "./kit/index.js";
+import { enableTilt, esc, LocalStore, Theme, ThemeToggle } from "./kit/index.js";
 import { api, onUnauthorized, run } from "./shell/api.js";
 import { renderNav } from "./shell/nav.js";
 import { route } from "./shell/router.js";
 import { can, loadMe, login, logout, onSessionChange } from "./shell/session.js";
 import { state } from "./shell/state.js";
+import { startFinder } from "./shell/finder/index.js";
 import { enterSupport, exitSupport, supportBanner } from "./shell/support.js";
 import { toast } from "./shell/toast.js";
 
@@ -35,6 +36,7 @@ function brand(p) {
 
 function frame() {
   new ThemeToggle({ theme }).mount(document.querySelector("#theme"));
+  enableTilt(".kit-tilt, .kit-kpi");
   const open = () => document.body.classList.toggle("nav-open");
   document.querySelector("#menu").onclick = open;
   document.querySelector(".scrim").onclick = open;
@@ -45,10 +47,10 @@ async function boot() {
   state.product = await (await fetch("/product.json")).json();
   brand(state.product);
   frame();
-  for (const name of state.product.modules) {
-    const mod = await import(`/assets/modules/${name}.js`);
-    state.routes.push(...mod.routes);
-  }
+  // All modules download at once (not one after another); routes keep product.json's order.
+  const modules = await Promise.all(state.product.modules.map((name) => import(`/assets/modules/${name}.js`)));
+  modules.forEach((mod) => state.routes.push(...mod.routes));
+  startFinder(modules, store, document.querySelector("#find"));
   onSessionChange(renderNav);
   onSessionChange(supportBanner);
   onUnauthorized(async () => { if (!(await exitSupport())) logout(); });   // an expired support session goes back, not out

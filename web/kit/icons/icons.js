@@ -59,6 +59,19 @@ const ICONS = {
   phone: "M7 2h10v20H7zM11 18h2",
   info: "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 11v6M12 7.5v.5",
   task: "M9 6h11M9 12h11M9 18h11M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2",
+  camera: "M3 8h4l2-3h6l2 3h4v12H3zM12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8z",
+  upload: "M12 16V4M7 9l5-5 5 5M4 20h16",
+  keyboard: "M3 6h18v12H3zM7 10h.01M11 10h.01M15 10h.01M7 14h10",
+  cube: "M12 2l9 5v10l-9 5-9-5V7zM3 7l9 5 9-5M12 12v10",
+  monitor: "M3 4h18v12H3zM8 20h8M12 16v4",
+  flame: "M12 22a7 7 0 0 0 7-7c0-4-3-6-4-10-2 2-3 4-3 6-1-1-2-2-2-4-2 2-5 5-5 8a7 7 0 0 0 7 7z",
+  play: "M7 4l13 8-13 8z",
+  pause: "M7 4h4v16H7zM14 4h4v16h-4z",
+  bolt: "M13 2L4 14h7l-1 8 9-12h-7z",
+  receipt: "M5 3h14v18l-3-2-2 2-2-2-2 2-2-2-3 2zM9 8h6M9 12h6M9 16h4",
+  download: "M12 4v12M7 11l5 5 5-5M4 20h16",
+  command: "M9 6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3z",
+  expand: "M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5",
 };
 
 export function registerIcons(more) { Object.assign(ICONS, more); }

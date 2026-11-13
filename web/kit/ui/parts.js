@@ -34,4 +34,4 @@ export const steps = (names, at) => html`<ol class="kit-steps">${names.map((n, i
 /** pill("sent", "warn") */
 export const pill = (text, tone = "") => html`<span class="kit-pill ${tone}">${text}</span>`;
 
-export const avatar = (name = "") => html`<span class="kit-avatar" aria-hidden="true">${name.split(/\s+/).map((p) => p[0] || "").join("").slice(0, 2).toUpperCase()}</span>`;
+export { avatar } from "../profile/avatar.js";

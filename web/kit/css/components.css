@@ -11,8 +11,21 @@
 .kit-iconbtn:hover { background: var(--card-2); color: var(--ink); transform: translateY(-1px); }
 .kit-iconbtn.small { width: 30px; height: 30px; border-radius: 9px; }
 .kit-iconbtn.danger:hover { color: var(--bad); }
-.kit-avatar { display: inline-grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; font-weight: 700; font-size: 13px; color: #fff;
-  background: linear-gradient(135deg, #f59e0b, #ec4899 55%, #8b5cf6); }
+.kit-avatar { --av: 36px; position: relative; display: inline-grid; place-items: center; flex: none; width: var(--av); height: var(--av); border-radius: 50%;
+  font-weight: 700; font-size: calc(var(--av) * .38); color: #fff; letter-spacing: .02em;
+  background: linear-gradient(135deg, var(--av-a, #f59e0b), var(--av-b, #8b5cf6)); box-shadow: 0 0 0 2px var(--card); }
+.kit-avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: block; }
+.kit-avatar.ring { padding: 3px; background: conic-gradient(from var(--spin, 0deg), var(--av-a, #f97316), var(--av-b, #8b5cf6), #22d3ee, var(--av-a, #f97316));
+  animation: kit-avspin 6s linear infinite; }
+.kit-avatar.ring > b, .kit-avatar.ring > img { width: 100%; height: 100%; border-radius: 50%; display: grid; place-items: center;
+  box-shadow: 0 0 0 3px var(--card); background: linear-gradient(135deg, var(--av-a), var(--av-b)); }
+@property --spin { syntax: "<angle>"; initial-value: 0deg; inherits: false; }
+@keyframes kit-avspin { to { --spin: 360deg; } }
+.kit-avstatus { position: absolute; right: 0; bottom: 0; width: 28%; height: 28%; border-radius: 50%; border: 2px solid var(--card); background: var(--muted); }
+.kit-avstatus.on { background: #22c55e; } .kit-avstatus.busy { background: #f59e0b; }
+.kit-avstack { display: inline-flex; } .kit-avstack > .kit-avatar + .kit-avatar { margin-left: calc(var(--av) * -.3); }
+.kit-avatar.more { background: var(--bg-2); color: var(--ink-2); }
+@media (prefers-reduced-motion: reduce) { .kit-avatar.ring { animation: none; } }
 
 .kit-phead { display: flex; align-items: center; gap: 16px; margin: 4px 0 18px; animation: kit-fade .3s ease-out; }
 .kit-phead h1 { margin: 0; }
@@ -100,3 +113,8 @@ a.kit-kpi:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
 .kit-scan { width: 100%; border-radius: 12px; background: #000; }
 .kit-sign { display: grid; gap: 8px; justify-items: start; }
 .kit-sign canvas { width: 100%; height: auto; border: 2px dashed var(--line); border-radius: 12px; background: #fff; touch-action: none; }
+
+/* 3D tilt (enableTilt) */
+.kit-tilt { transition: transform .25s ease, box-shadow .25s; transform: perspective(700px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); will-change: transform; }
+.kit-tilt.kit-tilting { transition: transform .05s linear, box-shadow .25s; box-shadow: var(--shadow-lg);
+  background-image: radial-gradient(circle at var(--gx) var(--gy), color-mix(in srgb, #fff 18%, transparent), transparent 55%); }

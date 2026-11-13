@@ -35,7 +35,9 @@ onUnauthorized(logout);
 
 // /me says whether the user is staff (is_staff) and which permissions they hold (perms); "*" = everything.
 const staff = () => !!state.me && (state.me.is_staff ?? state.me.role !== (state.product.member_role || "member"));
-export const can = (perm) => !!state.me && (state.me.role === "admin" || (state.me.perms || []).includes("*") || (!perm && staff()) || (state.me.perms || []).includes(perm));
+/** perm: one permission, or a list where any one is enough. */
+export const can = (perm) => Array.isArray(perm) ? perm.some(can)
+  : !!state.me && (state.me.role === "admin" || (state.me.perms || []).includes("*") || (!perm && staff()) || (state.me.perms || []).includes(perm));
 
 /** A route marked tenant: true works inside one business/organisation (/me tenant); a platform operator has none. */
 export const outside = (r) => !!(r.tenant && state.me && !state.me.tenant);

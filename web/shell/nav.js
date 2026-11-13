@@ -38,7 +38,8 @@ function who() {
   const me = state.me;
   if (!me) return html`<a class="btn small primary" href="#/login">Log in</a>`;
   const role = me.tenant ? (me.business_name || "Team") : me.role === "admin" ? "Platform operator" : me.role;
-  return html`${avatar(me.name || me.email || "?")}<span><span class="name">${me.name || ""}</span><span class="role">${role}</span></span>
+  return html`<a class="kit-me" href="#/profile" title="My profile">${avatar(me.name || me.email || "?", { photo: me.photo_id, size: 34 })}
+    <span><span class="name">${me.name || ""}</span><span class="role">${role}</span></span></a>
     <button type="button" class="kit-iconbtn" id="out" aria-label="Log out" title="Log out">${icon("logout")}</button>`;
 }
 
