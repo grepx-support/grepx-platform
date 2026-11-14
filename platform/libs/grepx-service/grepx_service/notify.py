@@ -6,7 +6,8 @@
 
 Keys are deterministic (ref + template + channel) so a replayed decision never
 sends twice. The notification-service decides whether the template is enabled,
-which channels are allowed, and renders the wording.
+which channels are allowed, and renders the wording. Files go along as attachments=[{name, mime, data_b64, url}]
+(url: a public link for channels that fetch the file themselves, e.g. WhatsApp through Twilio).
 """
 from __future__ import annotations
 import grepx_contracts as gc
@@ -21,7 +22,7 @@ DEFAULT_CHANNELS = ("email", "whatsapp")
 
 def notify(emitter, template: str, *, email: str = "", phone: str = "", values: Optional[dict] = None,
            channels: Optional[Iterable[str]] = None, ref: str = "", tenant_id: str = "", user_id: str = "",
-           auto: bool = True) -> list[str]:
+           auto: bool = True, attachments: Optional[list[dict]] = None) -> list[str]:
     keys = []
     for channel in channels or DEFAULT_CHANNELS:
         recipient = email if channel == "email" else phone
@@ -30,7 +31,8 @@ def notify(emitter, template: str, *, email: str = "", phone: str = "", values: 
         key = hashlib.sha1(f"{ref}|{template}|{channel}|{recipient}".encode()).hexdigest()
         emitter.request(NOTIFICATIONS_TABLE, key, {
             "action": "SEND", "template": template, "channel": channel, "recipient": recipient,
-            "values": values or {}, "ref": ref, "tenant_id": tenant_id, "user_id": user_id, "auto": auto},
+            "values": values or {}, "ref": ref, "tenant_id": tenant_id, "user_id": user_id, "auto": auto,
+            **({"attachments": attachments} if attachments else {})},
             NOTIFICATION_SERVICE)
         keys.append(key)
     return keys
