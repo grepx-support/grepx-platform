@@ -12,7 +12,7 @@ import { icon } from "../icons/icons.js";
 
 export class DataTable extends Component {
   /** props: { columns: [{key, label, render?(row) -> markup, sort?: false, align?: "end", value?(row)}],
-   *           rows, filter: true, empty, pageSize } */
+   *           rows, filter: true, empty, pageSize, onRow?(row) - clicking a row (or Enter on it) opens it } */
   constructor(props) {
     super({ filter: true, pageSize: 50, empty: "Nothing yet.", ...props });
     this.by = null; this.desc = false; this.query = ""; this.page = 0; this.size = this.props.pageSize;
@@ -48,11 +48,13 @@ export class DataTable extends Component {
   render() {
     const { columns, filter, empty } = this.props;
     const rows = this.rows();
+    this.shown = rows;
+    const open = this.props.onRow;
     return html`<div class="kit-table">${filter ? html`<label class="kit-search">${icon("search", { size: 16 })}<input type="search" placeholder="Filter"
         value="${this.query}" aria-label="Filter rows"></label>` : ""}
       <div class="kit-scroll"><table><thead><tr>${columns.map((c) => html`<th class="${c.align === "end" ? "end" : ""}">${c.sort === false ? c.label
         : html`<button type="button" data-sort="${c.key}" class="kit-sort ${this.by === c.key ? (this.desc ? "desc" : "asc") : ""}">${c.label}</button>`}</th>`)}</tr></thead>
-      <tbody>${rows.length ? rows.map((r) => html`<tr>${columns.map((c) => html`<td class="${c.align === "end" ? "end" : ""}">${c.render ? raw(c.render(r)) : r[c.key] ?? ""}</td>`)}</tr>`)
+      <tbody>${rows.length ? rows.map((r, i) => html`<tr ${open ? raw(`class="kit-row-link" tabindex="0" data-row="${i}"`) : ""}>${columns.map((c) => html`<td class="${c.align === "end" ? "end" : ""}">${c.render ? raw(c.render(r)) : r[c.key] ?? ""}</td>`)}</tr>`)
         : html`<tr><td colspan="${columns.length}" class="muted">${empty}</td></tr>`}</tbody></table></div>${this.pager()}</div>`;
   }
 
@@ -63,6 +65,15 @@ export class DataTable extends Component {
       this.update();
     });
     this.el.querySelectorAll("[data-page]").forEach((b) => b.onclick = () => { this.page += Number(b.dataset.page); this.update(); });
+    if (this.props.onRow) {
+      const pick = (e) => {
+        const tr = e.target.closest("tr[data-row]");
+        if (tr && !e.target.closest("a, button, input, select, label, summary")) this.props.onRow(this.shown[Number(tr.dataset.row)], tr);
+      };
+      const body = this.el.querySelector("tbody");
+      body.addEventListener("click", pick);
+      body.addEventListener("keydown", (e) => { if (e.key === "Enter") pick(e); });
+    }
     const size = this.el.querySelector("[data-size]");
     if (size) size.onchange = () => { this.size = Number(size.value); this.page = 0; this.update(); };
     const input = this.el.querySelector("input[type=search]");

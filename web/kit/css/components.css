@@ -184,3 +184,5 @@ a.kit-hit > rect[rx] { transition: opacity .15s; } a.kit-hit:hover > rect[rx] { 
 .kit-recovery code { padding: 6px; text-align: center; border-radius: 6px; background: var(--soft, rgba(127,127,127,.12)); font-size: 15px; user-select: all; }
 
 .kit-chart svg { max-height: 300px; }                                    /* a chart in a wide card does not grow into a wall */
+.kit-row-link { cursor: pointer; } .kit-row-link:hover td, .kit-row-link:focus-visible td { background: color-mix(in srgb, var(--primary) 7%, transparent); }
+.kit-kcard { cursor: pointer; }
