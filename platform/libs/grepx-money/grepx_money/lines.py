@@ -21,8 +21,8 @@ def document_lines(raw_lines: list, items: dict[str, dict]) -> list[dict]:
             continue
         line = make_line(raw.get("qty"), raw.get("unit_price"), raw.get("discount") or 0)
         out.append({"item_id": raw.get("item_id") or "", "description": description or "Item",
-                    "unit": (item or {}).get("unit") or str(raw.get("unit") or ""), "qty": str(line.qty.normalize()),
-                    "unit_price": line.unit_price, "discount": str(line.discount.normalize()), "amount": totals([line]).subtotal})
+                    "unit": (item or {}).get("unit") or str(raw.get("unit") or ""), "qty": format(line.qty.normalize(), "f"),
+                    "unit_price": line.unit_price, "discount": format(line.discount.normalize(), "f"), "amount": totals([line]).subtotal})
     if not out:
         raise ValueError("NO_LINES")
     return out
