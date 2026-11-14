@@ -19,6 +19,7 @@ dependencies = [
     "grepx-web-bootstrap",
     "nexus-client",
     "fastapi>=0.110",
+    "openpyxl>=3.1",
     "python-multipart>=0.0.9",
 ]
 
