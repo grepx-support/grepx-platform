@@ -60,6 +60,18 @@ export async function route() {
     await r.render(page, { ...params, args });
     revealPasswords(page);                                 // every password box gets "show password"
   } catch (e) {
-    page.innerHTML = `<div class="card"><h2>Couldn't load this page</h2><p>${esc(e.message)}</p>${e.trace ? `<p class="muted">trace ${esc(e.trace)}</p>` : ""}</div>`;
+    page.innerHTML = loadError(e);
+    page.querySelector("[data-retry]")?.addEventListener("click", () => route());
   }
+}
+
+/** The card shown when a page cannot load: what happened in plain words, try again, and the trace for support. */
+function loadError(e) {
+  const down = !e.status || e.status >= 500;
+  const hint = down ? "A part of the system did not answer. Try again in a moment; if it keeps happening, the server may need its latest update"
+    + " (the administrator runs the update and restart)." : e.message;
+  return `<div class="card kit-loaderr"><h2>Couldn't load this page</h2><p>${esc(hint)}</p>
+    ${down && e.message && e.message !== "Something went wrong" ? `<p class="muted small">${esc(e.message)}</p>` : ""}
+    <p><button class="btn primary" data-retry>Try again</button> <a class="btn" href="#/">Home</a></p>
+    ${e.trace ? `<p class="muted small">trace ${esc(e.trace)}</p>` : ""}</div>`;
 }
