@@ -10,7 +10,7 @@
 import { api, run, toast } from "../../app.js";
 import { html, icon, pageHead, pill } from "../../kit/index.js";
 
-const LOOK = { email: ["mail", "#2563eb", "an email address"], sms: ["phone", "#f59e0b", "a mobile number, +country code"], whatsapp: ["message", "#16a34a", "a WhatsApp number, +country code"] };
+const LOOK = { google: ["user", "#4285f4", ""], microsoft: ["building", "#0078d4", ""], company: ["lock", "#7c3aed", ""], email: ["mail", "#2563eb", "an email address"], sms: ["phone", "#f59e0b", "a mobile number, +country code"], whatsapp: ["message", "#16a34a", "a WhatsApp number, +country code"] };
 
 const field = (f) => html`<label class="ig-field"><span>${f.label}${f.secret ? html` ${pill(f.set ? "saved" : "not set", f.set ? "good" : "")}` : ""}</span>
   <input name="${f.name}" ${f.secret ? 'type="password" autocomplete="new-password"' : ""} value="${f.value}" placeholder="${f.secret && f.set ? "•••••••• (leave empty to keep)" : f.hint}"></label>`;
@@ -19,10 +19,11 @@ const card = (c) => {
   const [ic, colour, to] = LOOK[c.channel] || ["dot", "#64748b", "an address"];
   return html`<section class="card ig-card ${c.live ? "live" : ""}" style="--c:${colour}" data-ch="${c.channel}">
     <header><span class="ig-icon">${icon(ic, { size: 20 })}</span><h2>${c.label}</h2>${pill(c.live ? "Live" : "Test mode", c.live ? "good" : "warn")}</header>
-    <p class="muted small">${c.live ? "Messages on this channel are really sent." : "Not connected: messages are recorded in the log and the outbox, not sent."}</p>
+    <p class="muted small">${c.sign_in ? (c.live ? "The button shows on the login page." : "Off: no button on the login page.")
+      : c.live ? "Messages on this channel are really sent." : "Not connected: messages are recorded in the log and the outbox, not sent."}</p>
     <form data-save>${c.fields.map(field)}<div class="row"><button class="btn primary">${icon("check", { size: 15 })} Save</button>
       <button type="button" class="btn" data-test>${icon("bolt", { size: 15 })} Test the connection</button></div></form>
-    <form class="ig-send" data-send><input name="to" placeholder="Send a test to ${to}" required><button class="btn">${icon("send", { size: 15 })} Send test</button></form>
+    ${c.sign_in ? "" : html`<form class="ig-send" data-send><input name="to" placeholder="Send a test to ${to}" required><button class="btn">${icon("send", { size: 15 })} Send test</button></form>`}
     <p class="ig-result" aria-live="polite"></p></section>`;
 };
 
@@ -46,7 +47,7 @@ async function integrations(el) {
         say(`${r.ok ? "✓" : "✗"} ${r.message}`, r.ok ? "good" : "bad");
       } catch (err) { say(`✗ ${err.message}`, "bad"); }
     };
-    box.querySelector("[data-send]").onsubmit = async (e) => {
+    if (box.querySelector("[data-send]")) box.querySelector("[data-send]").onsubmit = async (e) => {
       e.preventDefault();
       say("Sending…", "");
       try {

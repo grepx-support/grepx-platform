@@ -31,6 +31,7 @@ const ICONS = {
   arrow: "M5 12h14M13 6l6 6-6 6",
   alert: "M12 3 2 20h20zM12 10v4M12 17h.01",
   clock: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 7v5l3 2",
+  lock: "M6 11h12v10H6zM8 11V7a4 4 0 0 1 8 0v4M12 15v2",
   inbox: "M3 13h5l1 3h6l1-3h5M5 5h14l2 8v6H3v-6z",
   outbox: "M12 15V3M8 7l4-4 4 4M3 13h5l1 3h6l1-3h5v6H3z",
   swap: "M7 4 3 8l4 4M3 8h14M17 20l4-4-4-4M21 16H7",

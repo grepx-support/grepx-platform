@@ -25,10 +25,14 @@ def staff(user: Principal = Depends(admin), gw=Depends(gateway)):
 
 @router.post("/users/{user_id}/{op}")
 def user_op(user_id: str, op: str, body: dict, user: Principal = Depends(admin), gw=Depends(gateway)):
-    """op: role {role} | staff-role {staff_role_id} | permission {perm, enabled} | set-password {password?} | send-reset"""
+    """op: role {role} | staff-role {staff_role_id} | permission {perm, enabled} | set-password {password?} | send-reset
+    | two-step-off (someone lost their phone and their recovery codes)"""
     if op in ("role", "staff-role", "permission"):
         action = {"role": "SET_ROLE", "staff-role": "SET_STAFF_ROLE", "permission": "SET_PERMISSION"}[op]
         return gw.command(gc.access.REQUESTS, gc.access.SERVICE, {"action": action, "user_id": user_id, "actor_id": user.user_id, **body}).fields
+    if op == "two-step-off":
+        gw.command(gc.auth.REQUESTS, gc.auth.SERVICE, {"action": "TWO_STEP_DISABLE", "user_id": user_id, "by_admin": True, "actor_id": user.user_id})
+        return {"ok": True}
     person = gw.one(gw.people, user_id) or {}
     if op == "set-password":
         v = gw.command(gc.auth.REQUESTS, gc.auth.SERVICE, {"action": "SET_PASSWORD", "user_id": user_id, "email": person.get("email", ""),

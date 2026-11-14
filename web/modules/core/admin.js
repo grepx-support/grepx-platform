@@ -10,11 +10,13 @@ import { api, esc, run, state } from "../../app.js";
 export const routes = [
   { path: "/admin/staff", nav: "Staff", icon: "users", group: "Platform", area: "#0ea5e9", auth: "admin", platform: true, render: async function draw(el) {
     const d = await api("/admin/access/staff");
-    el.innerHTML = `<h1>Staff & roles</h1><div class="card"><table><tr><th>Name</th><th>Role</th><th>Staff role</th><th>Permissions</th></tr>
+    el.innerHTML = `<h1>Staff & roles</h1><div class="card"><table><tr><th>Name</th><th>Role</th><th>Staff role</th><th>Permissions</th><th></th></tr>
       ${d.staff.map((s) => `<tr><td>${esc(s.name || s.id)}</td><td>${esc(s.role)}</td><td><select data-u="${s.id}"><option value="">—</option>${d.roles.map((r) => `<option value="${r.id}" ${r.id === s.staff_role_id ? "selected" : ""}>${esc(r.name)}</option>`).join("")}</select></td>
-      <td class="muted">${esc((s.effective || []).join(", "))}</td></tr>`).join("")}</table></div><br>
+      <td class="muted">${esc((s.effective || []).join(", "))}</td>
+      <td><button class="btn small" data-off="${s.id}" title="For someone who lost their phone">Two-step off</button></td></tr>`).join("")}</table></div><br>
       <form id="p" class="card row"><div><label>Make someone staff (user id)</label><input name="u" required></div><div><label>Role</label><select name="r">${(state.product.roles || ["member", "staff", "admin"]).map((r) => `<option>${esc(r)}</option>`).join("")}</select></div><button class="btn primary">Save</button></form>`;
     el.querySelectorAll("[data-u]").forEach((s) => s.onchange = () => run(() => api(`/admin/access/users/${s.dataset.u}/staff-role`, { method: "POST", body: { staff_role_id: s.value } }), "Saved"));
+    el.querySelectorAll("[data-off]").forEach((b) => b.onclick = () => run(() => api(`/admin/access/users/${b.dataset.off}/two-step-off`, { method: "POST", body: {} }), "Two-step login switched off - they can sign in with the password"));
     el.querySelector("#p").onsubmit = async (e) => { e.preventDefault(); const f = new FormData(e.target); await run(() => api(`/admin/access/users/${f.get("u")}/role`, { method: "POST", body: { role: f.get("r") } }), "Saved"); draw(el); };
   } },
   { path: "/admin/system", nav: "System", icon: "shield", group: "Platform", area: "#64748b", auth: "admin", platform: true, render: async function draw(el, q) {

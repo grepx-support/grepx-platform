@@ -3,6 +3,6 @@
 # Unauthorised copying, use, modification or distribution is strictly prohibited.
 
 """Routers every product BFF gets for free (mounted by grepx_bff.create_app)."""
-from . import access, auth, gateway_commands, integrations, media, messages, photo, profile, tasks
+from . import access, auth, gateway_commands, integrations, media, messages, photo, profile, tasks, sign_in, two_step
 
-COMMON_ROUTERS = [auth.router, profile.router, photo.router, tasks.router, messages.router, integrations.router, access.router, media.router, gateway_commands.router]
+COMMON_ROUTERS = [auth.router, sign_in.router, two_step.router, profile.router, photo.router, tasks.router, messages.router, integrations.router, access.router, media.router, gateway_commands.router]

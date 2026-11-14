@@ -20,6 +20,9 @@ class Login(BaseModel):
 
 
 def session(gw, verdict) -> dict:
+    """The login answer: a session, or - with two-step login on - {two_step, challenge} for /auth/login/code."""
+    if verdict.fields.get("two_step"):
+        return {"two_step": True, "challenge": verdict.fields["challenge_enc"]}
     return {"token": gw.box.open(verdict.fields["token_enc"]), "user_id": verdict.fields["user_id"], "role": verdict.fields["role"],
             "expires_hours": verdict.fields["expires_hours"]}
 
@@ -29,6 +32,15 @@ def login(body: Login, gw=Depends(gateway)):
     gw.limit(f"login:{body.email.lower()}", rate=10, per=60)
     return session(gw, gw.command(gc.auth.REQUESTS, gc.auth.SERVICE, {"action": "LOGIN", "email": body.email,
                                                                     "password_enc": gw.box.seal(body.password), "remember": body.remember}))
+
+
+@router.post("/login/code")
+def login_code(body: dict, gw=Depends(gateway)):
+    """Second step: the authenticator app's six digits (or a recovery code) with the challenge from the first step."""
+    challenge = str(body.get("challenge") or "")
+    gw.limit(f"code:{challenge[-24:]}", rate=5, per=60)
+    return session(gw, gw.command(gc.auth.REQUESTS, gc.auth.SERVICE, {"action": "LOGIN_CODE", "challenge_enc": challenge,
+                                                                    "code": str(body.get("code") or "")}))
 
 
 @router.post("/forgot")

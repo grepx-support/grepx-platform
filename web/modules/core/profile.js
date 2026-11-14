@@ -33,7 +33,8 @@ function view(me) {
     <div class="grid two">
       <section class="card"><h2>${icon("user")} Details</h2><dl class="kit-facts">
         <dt>Email</dt><dd>${me.email || "-"}</dd><dt>Phone</dt><dd>${me.phone || "-"}</dd>
-        <dt>Access</dt><dd>${(me.perms || []).includes("*") ? "Everything" : `${(me.perms || []).length} permissions`}</dd></dl></section>
+        <dt>Access</dt><dd>${(me.perms || []).includes("*") ? "Everything" : `${(me.perms || []).length} permissions`}</dd></dl>
+        <p><a class="btn" href="#/security">${icon("lock", { size: 15 })} Sign-in & security</a></p></section>
       <section class="card"><h2>${icon("keyboard")} Shortcuts</h2><dl class="kit-facts kit-keys">
         ${SHORTCUTS.map(([keys, what]) => html`<dt>${keys.map((k) => html`<kbd>${k}</kbd>`)}</dt><dd>${what}</dd>`)}</dl></section>
     </div></section>`;

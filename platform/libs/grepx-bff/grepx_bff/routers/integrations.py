@@ -25,7 +25,16 @@ CHANNELS = {
                               ("WHATSAPP_TOKEN", "Meta access token", True, "WhatsApp Cloud API, permanent token"), ("WHATSAPP_PHONE_ID", "Meta phone number ID", False, ""),
                               ("TWILIO_WHATSAPP_FROM", "Twilio WhatsApp number", False, "uses the SMS Twilio account")],
                  [["WHATSAPP_TOKEN", "WHATSAPP_PHONE_ID"], ["TWILIO_SID", "TWILIO_TOKEN", "TWILIO_WHATSAPP_FROM"]]),
+    "google": ("Sign in with Google", [("GOOGLE_CLIENT_ID", "OAuth client ID", False, "Google Cloud console -> Credentials -> OAuth client (Web); redirect URI = this site's address + /")],
+               [["GOOGLE_CLIENT_ID"]]),
+    "microsoft": ("Sign in with Microsoft", [("MICROSOFT_CLIENT_ID", "Application (client) ID", False, "Entra ID -> App registrations; platform Web, redirect URI = this site + /, ID tokens on"),
+                                             ("MICROSOFT_TENANT", "Directory (tenant) ID", False, "only your company's accounts; empty = any Microsoft account")],
+                  [["MICROSOFT_CLIENT_ID"]]),
+    "company": ("Company sign-in (OpenID Connect)", [("OIDC_LABEL", "Button text", False, "Okta, Auth0, Keycloak, Zoho..."), ("OIDC_ISSUER", "Issuer address", False, "https://yourcompany.okta.com"),
+                                                     ("OIDC_CLIENT_ID", "Client ID", False, "implicit flow with ID token; redirect URI = this site + /")],
+                [["OIDC_ISSUER", "OIDC_CLIENT_ID"]]),
 }
+SIGN_IN = {"google", "microsoft", "company"}       # no message to send; "test" only checks the settings are there
 NAMES = {name for _, fields, _ in CHANNELS.values() for name, *_ in fields}
 
 
@@ -37,7 +46,7 @@ def view(rows: dict[str, dict]) -> list[dict]:
     has = lambda n: bool((rows.get(n) or {}).get("value"))
     out = []
     for key, (label, fields, live) in CHANNELS.items():
-        out.append({"channel": key, "label": label, "live": any(all(has(n) for n in group) for group in live),
+        out.append({"channel": key, "label": label, "sign_in": key in SIGN_IN, "live": any(all(has(n) for n in group) for group in live),
                     "fields": [{"name": n, "label": l, "secret": s, "hint": hint, "set": has(n),
                                 "value": "" if s or is_sealed((rows.get(n) or {}).get("value", "")) else (rows.get(n) or {}).get("value", "")} for n, l, s, hint in fields]})
     return out
@@ -68,6 +77,9 @@ def test(channel: str, user: Principal = Depends(admin), gw=Depends(gateway)):
     if channel not in CHANNELS:
         raise ApiError("UNKNOWN_CHANNEL", 404)
     """Sign in to the provider: {ok, message} - a failure carries the provider's own words (wrong password, unknown host)."""
+    if channel in SIGN_IN:
+        live = next(c for c in view(saved(gw)) if c["channel"] == channel)["live"]
+        return {"ok": live, "message": "Ready - the button shows on the login page." if live else "Not set up yet - save its settings first."}
     try:
         out = gw.command(gc.notification.REQUESTS, gc.notification.SERVICE, {"action": "TEST_CHANNEL", "channel": channel}).fields
         return {"ok": True, "message": out.get("message", "Connected")}
