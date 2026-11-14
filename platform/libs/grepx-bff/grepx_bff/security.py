@@ -25,6 +25,7 @@ class Principal:
     tenant: str = ""            # the organisation the login belongs to (auth-service puts it in the token); "" = the platform
     support: bool = False       # a platform admin working inside `tenant` with a support token (see support.py)
     read_only: bool = False     # ... that may look but not change anything
+    name: str = ""              # shown as who did it when there is no person (an API key's name)
 
     @property
     def is_staff(self) -> bool:
@@ -45,7 +46,24 @@ def gateway(request: Request):
 READS = ("GET", "HEAD", "OPTIONS")
 
 
-def optional_user(request: Request, authorization: Optional[str] = Header(default=None), gw=Depends(gateway)) -> Optional[Principal]:
+def key_principal(request: Request, gw, value: str) -> Principal:
+    """An API key acts for its organisation as staff with every permission it is given; a read key cannot change anything."""
+    from grepx_bff import api_keys
+    row = api_keys.check(gw, value)
+    roles = Roles.of(gw.cfg)
+    user = Principal(f"api:{row['_key']}", roles.staff[0], ["*"], roles, str(row.get("tenant_id") or ""), read_only=row.get("scope") != "write",
+                     name=f"API: {row.get('name', '')}")
+    if user.read_only and request.method not in READS:
+        raise ApiError("READ_ONLY_KEY", 403)
+    return user
+
+
+def optional_user(request: Request, authorization: Optional[str] = Header(default=None), x_api_key: Optional[str] = Header(default=None),
+                  gw=Depends(gateway)) -> Optional[Principal]:
+    if x_api_key:
+        return key_principal(request, gw, x_api_key)
+    if authorization and authorization.lower().startswith("bearer gx_"):
+        return key_principal(request, gw, authorization[7:].strip())
     if not authorization or not authorization.lower().startswith("bearer "):
         return None
     try:
