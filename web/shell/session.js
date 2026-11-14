@@ -45,4 +45,6 @@ export const outside = (r) => !!(r.tenant && state.me && !state.me.tenant);
 export const allowed = (r) => (r.auth === "staff" ? staff() && can(r.perm) : r.auth === "user" ? !!state.me : r.auth === "admin" ? state.me?.role === "admin" : true);
 /** A route marked platform: true is for the platform itself (no organisation) - hidden while inside one. */
 const insideOnly = (r) => !!(r.platform && state.me?.tenant);
-export const visible = (r) => !r.nav || (!outside(r) && !insideOnly(r) && allowed(r));
+/** A route marked feature: "x" shows only while the organisation has that feature on (/me features; on unless said off). */
+export const featureOn = (r) => !r.feature || (state.me?.features || {})[r.feature] !== false;
+export const visible = (r) => !r.nav || (!outside(r) && !insideOnly(r) && allowed(r) && featureOn(r));
