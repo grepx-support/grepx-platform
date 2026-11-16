@@ -12,8 +12,10 @@ import { icon } from "../icons/icons.js";
 import { canScan, scanBarcode } from "../ui/scanner.js";
 
 export class ItemPalette extends Component {
-  /** props: { items: [{id, name, unit, category, hint, barcode}], title, scan } - emits "pick" (item); scan: a camera button
-   *  that picks the item whose barcode was scanned (where the browser can scan) */
+  /** props: { items: [{id, name, unit, category, hint, barcode}], title, scan, resolve } - emits "pick" (item); scan: a camera
+   *  button that picks the item whose barcode was scanned (where the browser can scan). A USB / Bluetooth scanner types the
+   *  code into the search box and presses Enter: the same match. resolve(code) -> item | null: other codes the product
+   *  knows (e.g. a lot label), tried after the items' own barcodes. */
   constructor(props) {
     super(props);
     this.events = new Emitter();
@@ -46,10 +48,16 @@ export class ItemPalette extends Component {
     const input = this.el.querySelector("input");
     input.oninput = () => { this.query = input.value; const at = input.selectionStart; this.update(); const next = this.el.querySelector("input"); next.focus(); next.setSelectionRange(at, at); };
     this.el.querySelectorAll("[data-cat]").forEach((b) => b.onclick = () => { this.category = b.dataset.cat; this.update(); });
+    input.onkeydown = (e) => {                             // a scanner "types" the code and presses Enter
+      if (e.key !== "Enter") return;
+      e.preventDefault();
+      const item = this.match(input.value.trim());
+      if (item) { this.query = ""; this.update(); this.events.emit("pick", item); this.el.querySelector("input").focus(); }
+    };
     this.el.querySelector("[data-scan]")?.addEventListener("click", async () => {
       const code = await scanBarcode();
       if (!code) return;
-      const item = this.props.items.find((i) => i.barcode && i.barcode === code);
+      const item = this.match(code);
       if (item) this.events.emit("pick", item);
       else { this.query = code; this.update(); }
     });
@@ -57,4 +65,11 @@ export class ItemPalette extends Component {
   }
 
   item(id) { return this.props.items.find((i) => i.id === id); }
+
+  /** The item a scanned code stands for: its barcode, then the product's own codes (resolve), else null. */
+  match(code) {
+    if (!code) return null;
+    const found = this.props.items.find((i) => i.barcode && i.barcode === code) || this.props.resolve?.(code);
+    return found ? this.item(found.id) || found : null;
+  }
 }
