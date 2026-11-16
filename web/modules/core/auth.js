@@ -14,7 +14,8 @@ export const routes = [
       <form id="f"><label>Email</label><input name="email" type="email" required><label>Password</label><input name="password" type="password" required>
       <label class="check"><input type="checkbox" name="remember"> Keep me signed in for 7 days</label>
       <p><button class="btn primary">Log in</button> <a href="#/forgot">Forgot password?</a></p></form><div id="sso"></div>
-      ${state.product.signup === false ? "" : '<p class="muted">New here? <a href="#/register">Create an account</a></p>'}</div>`;
+      ${state.product.signup === false ? "" : state.product.signup === "business" ? '<p class="muted">New here? <a href="#/signup">Start your business - free</a></p>'
+        : '<p class="muted">New here? <a href="#/register">Create an account</a></p>'}</div>`;
     el.querySelector("#f").onsubmit = async (e) => {
       e.preventDefault(); const f = new FormData(e.target);
       const s = await run(() => api("/auth/login", { method: "POST", body: { email: f.get("email"), password: f.get("password"), remember: !!f.get("remember") } }));

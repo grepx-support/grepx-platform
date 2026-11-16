@@ -23,7 +23,7 @@ export async function api(path, { method = "GET", body, form } = {}) {
     const d = data.detail || {};
     if (res.status === 401 && state.session) listeners.unauthorized();
     const err = new Error(d.message || "Something went wrong");
-    err.reason = d.reason; err.trace = trace; err.status = res.status;
+    err.reason = d.reason; err.detail = d.detail || ""; err.trace = trace; err.status = res.status;
     throw err;
   }
   return data;
