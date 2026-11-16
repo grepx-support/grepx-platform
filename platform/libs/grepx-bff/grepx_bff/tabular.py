@@ -30,21 +30,29 @@ class Table:
     rows: list[dict]          # {normalised heading: cell text}, with "_row" = the row number in the file
 
 
-def read(data: bytes, filename: str) -> Table:
-    """CSV (comma, semicolon or tab; UTF-8 with or without BOM, else Latin-1) or .xlsx (first sheet)."""
+def grid(data: bytes, filename: str) -> list[list[str]]:
+    """Every row of the file as text, as it is (title lines above the headings included) - for files whose headings
+    are not on the first line, e.g. a supplier's invoice. Long numbers stay whole (an IMEI is not 3.56e14)."""
     if len(data) > MAX_BYTES:
         raise TableError("FILE_TOO_LARGE")
-    grid = _xlsx(data) if filename.lower().endswith((".xlsx", ".xlsm")) else _csv(data)
-    grid = [[_text(c) for c in row] for row in grid]
-    while grid and not any(grid[0]):
-        grid.pop(0)
-    if not grid:
+    rows = _xlsx(data) if filename.lower().endswith((".xlsx", ".xlsm")) else _csv(data)
+    if len(rows) > MAX_ROWS * 2:
+        raise TableError("TOO_MANY_ROWS")
+    return [[_text(c) for c in row] for row in rows]
+
+
+def read(data: bytes, filename: str) -> Table:
+    """CSV (comma, semicolon or tab; UTF-8 with or without BOM, else Latin-1) or .xlsx (first sheet)."""
+    cells = grid(data, filename)
+    while cells and not any(cells[0]):
+        cells.pop(0)
+    if not cells:
         raise TableError("EMPTY_FILE")
-    heads = [norm(h) for h in grid[0]]
-    rows = [{"_row": n + 2, **{h: row[i] if i < len(row) else "" for i, h in enumerate(heads) if h}} for n, row in enumerate(grid[1:]) if any(row)]
+    heads = [norm(h) for h in cells[0]]
+    rows = [{"_row": n + 2, **{h: row[i] if i < len(row) else "" for i, h in enumerate(heads) if h}} for n, row in enumerate(cells[1:]) if any(row)]
     if len(rows) > MAX_ROWS:
         raise TableError("TOO_MANY_ROWS")
-    return Table([h for h in grid[0] if norm(h)], rows)
+    return Table([h for h in cells[0] if norm(h)], rows)
 
 
 def _text(cell) -> str:
