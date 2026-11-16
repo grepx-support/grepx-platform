@@ -30,7 +30,7 @@ function brand(p) {
   for (const [k, v] of Object.entries(p.theme || {})) document.documentElement.style.setProperty(`--${k}`, v);
   for (const href of p.styles || []) {                    // a product's own stylesheet(s), e.g. "kitchen/kitchen.css"
     const link = document.createElement("link");
-    Object.assign(link, { rel: "stylesheet", href: `/assets/modules/${href}` });
+    Object.assign(link, { rel: "stylesheet", href: new URL(`./modules/${href}`, import.meta.url).href });   // same build as this file
     document.head.append(link);
   }
   document.querySelector("#brand").innerHTML = `<span class="logo">${esc(p.logo || "")}</span><span>${esc(p.name)}<small>${esc(p.tagline || "")}</small></span>`;

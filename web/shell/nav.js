@@ -36,7 +36,12 @@ function links() {
   }
   const pinned = pins.read().map((p) => shown.find((r) => r.path === p)).filter(Boolean);
   const top = pinned.length ? html`<div class="group pinned">${icon("star", { size: 12 })} Pinned</div>${pinned.map((r, i) => link(r, active, i + 1))}` : "";
-  return [top, ...[...groups.entries()].map(([g, rs]) => {
+  // Pages without a group (Home, Approvals) come first; then the product's own order (product.json "nav_groups"), else the
+  // order the modules name them in - with Setup last, whichever module brought it in first.
+  const order = state.product?.nav_groups || [], seen = [...groups.keys()];
+  const rank = (g) => (!g ? -1 : order.includes(g) ? order.indexOf(g) : g === "Setup" ? 1e4 : 1e3 + seen.indexOf(g));
+  const sorted = [...groups.entries()].sort(([a], [b]) => rank(a) - rank(b));
+  return [top, ...sorted.map(([g, rs]) => {
     const shut = g && folded.has(g) && !rs.includes(active);
     return html`${g ? html`<button type="button" class="group" data-fold="${g}" aria-expanded="${String(!shut)}">${g}${icon("chevron", { size: 12 })}</button>` : ""}
       ${shut ? "" : rs.map((r) => link(r, active))}`;

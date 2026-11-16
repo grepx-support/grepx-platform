@@ -8,9 +8,8 @@
 // first code; ten recovery codes shown once), switch off (password and a code). Linked Google / Microsoft sign-ins.
 import { api, run, state } from "../../app.js";
 import { html, icon, openDialog, pageHead, pill, raw } from "../../kit/index.js";
-import qrcode from "../../vendor/qrcode.js";
-
-function qr(text) {
+async function qr(text) {                // the QR library (55 KB) loads only when someone switches two-step on
+  const { default: qrcode } = await import("../../vendor/qrcode.js");
   const q = qrcode(0, "M");
   q.addData(text);
   q.make();
@@ -20,9 +19,10 @@ function qr(text) {
 async function switchOn(again) {
   const s = await run(() => api("/me/two-step/start", { method: "POST", body: { issuer: state.product.name } }));
   if (!s) return;
+  const code = await qr(s.link);
   const box = document.createElement("div");
   box.innerHTML = String(html`<ol class="kit-steps"><li>Install an authenticator app (Google Authenticator, Microsoft Authenticator, Authy).</li>
-    <li>Scan this code with it - or type the key.</li></ol><div class="kit-qr">${raw(qr(s.link))}</div>
+    <li>Scan this code with it - or type the key.</li></ol><div class="kit-qr">${raw(code)}</div>
     <p class="muted small">Key: <code class="kit-key">${s.key.match(/.{1,4}/g).join(" ")}</code></p>
     <label>3. Type the 6-digit code the app shows<input name="code" inputmode="numeric" maxlength="6" class="kit-code"></label>`);
   const ok = await openDialog({ title: "Switch on two-step login", body: box, actions: [{ label: "Cancel", value: "" }, { label: "Switch on", value: "on", primary: true }] });
