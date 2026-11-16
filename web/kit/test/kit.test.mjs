@@ -10,6 +10,7 @@ import { test } from "node:test";
 import { esc, html, raw } from "../core/dom.js";
 import { Emitter } from "../core/emitter.js";
 import { MemoryStore } from "../core/local-store.js";
+import { code128Svg, code128Values } from "../ui/barcode.js";
 import { DashboardLayout } from "../dashboard/layout.js";
 import { WidgetRegistry } from "../dashboard/widget-registry.js";
 import { linear, niceCeil, niceMax, short, ticks } from "../charts/scale.js";
@@ -104,4 +105,14 @@ test("avatar: initials, a stable colour per name, the photo when there is one", 
   assert.deepEqual(hue("Olivia Owner"), hue("Olivia Owner"));
   assert.match(String(avatar("Olivia", { photo: "abc" })), /src="\/api\/v1\/media\/abc"/);
   assert.match(String(avatar("Olivia")), /<b>O<\/b>/);
+});
+
+test("code 128 barcodes: IMEIs in set C with a set-B last digit, text in set B, checksum, stop", () => {
+  assert.deepEqual(code128Values("12345"), [105, 12, 34, 100, 21, (105 + 12 + 34 * 2 + 100 * 3 + 21 * 4) % 103, 106]);
+  const v = code128Values("PF3X");
+  assert.equal(v[0], 104);
+  assert.equal(v.at(-2), (104 + 48 + 2 * 38 + 3 * 19 + 4 * 56) % 103);
+  assert.match(code128Svg("356938035643809"), /^<svg[^>]+aria-label="Barcode 356938035643809"/);
+  assert.throws(() => code128Values(""));
+  assert.throws(() => code128Values("café"));
 });
