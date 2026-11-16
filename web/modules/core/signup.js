@@ -7,7 +7,7 @@
 // Self-service sign-up of a new business (any business product with signup-service), in the GrepX look (grepx.sg):
 //   #/signup          details -> confirm email (link) and phone (code) -> the business is set up -> links + checklist
 //   #/signup/email    where the email link lands (?signup=..&token=..)
-//   /b/<name>         the business's own address: its public page;  /b/<name>/app: sign in to it
+//   /b/<name>         the business's own address: its public page (core/page.js);  /b/<name>/app: sign in to it
 // product.json: "signup": "business" switches it on; "signup_copy": {unit, checklist[]} in the product's words.
 import { api, esc, login, state } from "../../app.js";
 
@@ -239,24 +239,6 @@ async function fromEmail(el, q) {
   }
 }
 
-async function business(el, { args }) {
-  css();
-  el.innerHTML = '<div class="su-page"><div class="su-card"><p>Loading...</p></div></div>';
-  const card = el.querySelector(".su-card");
-  try {
-    const b = await api(`/public/address/${encodeURIComponent(args[0])}`);
-    if (b.moved) history.replaceState(null, "", `/b/${b.slug}#/b/${b.slug}`);
-    document.title = b.name;
-    card.innerHTML = `<span class="su-logo" style="width:64px;height:64px;font-size:28px">${esc((b.name || "?")[0])}</span>
-      <h1 class="su-h" style="font-size:48px">${esc(b.name)}</h1>
-      <p>Welcome! Our full page with offers and updates is coming soon.</p>
-      <a class="su-btn" style="padding:0 28px" href="/b/${esc(b.slug)}/app#/login">Staff sign in</a>
-      <span class="su-note">Runs on ${esc(state.product.name)}</span>`;
-  } catch (e) {
-    card.innerHTML = `<h2>No business here</h2><p>${esc(message(e))}</p><a class="su-btn" style="padding:0 28px" href="/#/signup">Start your own - free</a>`;
-  }
-}
-
 /** The platform operator: every sign-up, its stage, its address, and messages that only went to the log (no provider yet). */
 async function operatorList(el) {
   const { signups, addresses } = await api("/platform/signups");
@@ -277,5 +259,4 @@ export const routes = state.product.signup === "business" ? [
   { path: "/platform/signups", nav: "Sign-ups", icon: "users", group: "Platform", area: "#C9A96E", auth: "admin", platform: true, render: operatorList },
   { path: "/signup", bare: true, render: signup },
   { path: "/signup/email", bare: true, render: fromEmail },
-  { path: "/b/:slug", bare: true, render: business },
 ] : [];

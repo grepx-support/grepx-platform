@@ -153,16 +153,12 @@ def routers(section: str) -> list[APIRouter]:
     @public.get("/address/{slug}")
     def address(slug: str, gw=Depends(gateway)):
         """The business behind /b/<slug> (following renamed names); only its public name, never who is in it."""
-        slug, seen = slug.strip().lower(), set()
-        row = gw.one(gc.signup.ADDRESSES, slug)
-        while row is not None and row.get("moved_to") and slug not in seen and len(seen) < 5:
-            seen.add(slug)
-            slug = row["moved_to"]
-            row = gw.one(gc.signup.ADDRESSES, slug)
+        from grepx_bff.routers.business_page import resolve
+        slug, row, moved = resolve(gw, slug)
         business = gw.one(gc.business.BUSINESSES, row.get("business_id", "")) if row else None
         if business is None or business.get("closed"):
             raise ApiError("UNKNOWN_ADDRESS", 404)
-        return {"slug": slug, "name": business.get("name", ""), "product": row.get("product", ""), "moved": bool(seen)}
+        return {"slug": slug, "name": business.get("name", ""), "product": row.get("product", ""), "moved": moved}
 
     @platform.get("/signups")
     def signups(user: Principal = Depends(operator), gw=Depends(gateway)):
