@@ -70,8 +70,9 @@ export class Finder {
   go(n) {
     const it = this.items[n];
     if (!it) return;
-    this.recent.remember({ title: it.title, hint: it.hint, href: it.href, icon: it.icon, area: it.area });
     this.close();
+    if (it.run) return it.run();                       // e.g. "Ask AI": opens the assistant, no page to remember
+    this.recent.remember({ title: it.title, hint: it.hint, href: it.href, icon: it.icon, area: it.area });
     location.hash = it.href;
   }
 }

@@ -17,6 +17,7 @@ export function startAssistant(modules) {
   const brain = new Assistant([...modules.flatMap((m) => m.skills || []), ...CORE], fallback);
   const chat = new ChatPanel(brain, state.product?.assistant || {});
   document.body.append(chat.el);
+  window.grepxAssistant = { open: (question) => { chat.toggle(true); if (question) chat.ask(question); } };   // the finder's "Ask AI"
   const show = () => { chat.el.hidden = !(state.me && state.me.tenant); if (chat.el.hidden) chat.toggle(false); brain.forget(); };
   onSessionChange(show);
   show();

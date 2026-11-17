@@ -16,6 +16,7 @@ import { state } from "./shell/state.js";
 import { startAssistant } from "./shell/assistant/index.js";
 import { startExpand } from "./shell/expand.js";
 import { startFinder } from "./shell/finder/index.js";
+import { startTabbar } from "./shell/tabbar.js";
 import { enterSupport, exitSupport, supportBanner } from "./shell/support.js";
 import { toast } from "./shell/toast.js";
 
@@ -73,6 +74,7 @@ async function boot() {
   safely("search", () => startFinder(modules, store, document.querySelector("#find")));
   safely("chart expand", () => startExpand());
   safely("assistant", () => startAssistant(modules));
+  safely("tab bar", () => onSessionChange(startTabbar()));
   onSessionChange(renderNav);
   onSessionChange(supportBanner);
   onUnauthorized(async () => { if (!(await exitSupport())) logout(); });   // an expired support session goes back, not out

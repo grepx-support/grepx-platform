@@ -13,3 +13,17 @@
 @import url("kit/css/dnd.css");
 @import url("kit/css/density.css");
 @import url("kit/css/assistant.css");
+
+/* phone: the bottom tab bar (shell/tabbar.js) */
+.kit-tabbar { display: none; }
+@media (max-width: 760px) {
+  .kit-tabbar:not([hidden]) { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
+    padding: 6px 6px calc(6px + env(safe-area-inset-bottom)); background: color-mix(in srgb, var(--panel, #fff) 88%, transparent);
+    backdrop-filter: blur(14px); border-top: 1px solid var(--line, #e5e7eb); }
+  .kit-tabbar a, .kit-tabbar button { display: grid; justify-items: center; gap: 2px; padding: 6px 0; border: 0; background: none; color: var(--muted, #64748b);
+    font: 600 11px/1.1 inherit; text-decoration: none; border-radius: 12px; min-height: 52px; }
+  .kit-tabbar a.on { color: var(--primary, #2563eb); background: color-mix(in srgb, var(--primary, #2563eb) 10%, transparent); }
+  body:has(.kit-tabbar:not([hidden])) .main { padding-bottom: 84px; }
+  body:has(.kit-tabbar:not([hidden])) .as-fab { bottom: 88px; }
+}
+

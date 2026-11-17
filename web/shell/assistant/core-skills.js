@@ -5,6 +5,8 @@
  */
 
 // Skills every product gets: greetings and thanks, "what can you do", and opening any page by its name.
+import { api } from "../api.js";
+import { state } from "../state.js";
 import { rank } from "../finder/score.js";
 import { words } from "./intent.js";
 
@@ -37,8 +39,13 @@ const pages = (ctx) => ctx.pages().map((r) => ({ title: r.nav, href: `#${r.path}
 /** When nothing fits: the pages that match the words, and what to ask. */
 export const fallback = {
   id: "fallback",
-  answer: (t, ctx, me) => {
+  answer: async (t, ctx, me) => {
     const found = rank(t, pages(ctx)).slice(0, 4);
+    if (state.product?.ai?.ask && t.trim().split(/\s+/).length >= 2) {      // a real question: the AI answers from this business's data
+      const r = await api(state.product.ai.ask, { method: "POST", body: { question: t } }).catch(() => null);
+      if (r && r.ai) return { text: r.answer, links: found.slice(0, 2).map((p) => ({ label: p.title, href: p.href })), ai: true, fresh: false };
+      if (r && r.why) return { text: `${r.why} Here is what I can answer without it:`, links: found.map((p) => ({ label: p.title, href: p.href })), chips: me.suggestions(5), fresh: false };
+    }
     return { text: found.length ? "I'm not sure what you mean - is it one of these pages? Or try a question below." : "I don't know that one yet. Here is what I can answer:",
       links: found.map((p) => ({ label: p.title, href: p.href })), chips: me.suggestions(5), fresh: false };
   },

@@ -11,6 +11,17 @@ import { allowed, visible } from "../session.js";
 import { state } from "../state.js";
 import { rank } from "./score.js";
 
+/** "Ask AI": a question typed in the finder goes to the assistant, which answers from the business's own data
+ *  (products that offer AI name its endpoint in product.json "ai": {"ask": "/ai/ask"}). */
+export class AiSource {
+  group = "AI";
+  async find(query) {
+    if (!state.product?.ai || !state.me?.tenant || query.trim().split(/\s+/).length < 2) return [];
+    return [{ title: `Ask AI: "${query.trim()}"`, hint: "Answered from your own data", icon: "sparkle", area: "#7c3aed", href: "",
+      run: () => window.grepxAssistant?.open(query.trim()) }];
+  }
+}
+
 /** Every page in the menu the user may open. */
 export class PageSource {
   group = "Pages";
