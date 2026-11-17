@@ -77,6 +77,11 @@ function css() {
 .su-list{display:flex;flex-direction:column;gap:8px;margin:0;padding:0;list-style:none}
 .su-list li{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:12px;background:#0F0F0F;color:var(--body)}
 .su-hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.su-start{border:0;padding:0;margin:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.su-start legend{font-weight:600;margin-bottom:8px;color:var(--body)}
+.su-pick{flex-direction:row !important;gap:10px !important;align-items:flex-start;border:1.5px solid var(--line,#e5e7eb);border-radius:14px;padding:12px 14px;cursor:pointer;font-weight:400 !important}
+.su-pick:has(input:checked){border-color:var(--g1,#22c55e);box-shadow:0 0 0 3px rgba(34,197,94,.15)}.su-pick input{margin-top:3px;width:18px;height:18px}
+.su-pick span{display:grid;gap:3px}.su-pick small{color:var(--muted,#6b7280);font-size:13px;line-height:1.35}
+@media (max-width:600px){.su-start{grid-template-columns:minmax(0,1fr)}}
 .su-page{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;font-family:Inter,system-ui,sans-serif;color:rgba(255,255,255,.92);
  background:radial-gradient(ellipse at 50% 0%,#131313 0%,#0B0B0B 55%,#080808 100%)}
 .su-page .su-card{max-width:640px;text-align:center;align-items:center}
@@ -85,6 +90,11 @@ function css() {
 }
 
 const unit = () => (state.product.signup_copy || {}).unit || "business";
+// A product that can fill a new business with sample data (product.json "signup_demo": true) asks how to start: a demo
+// to explore (ticked) or empty for their own data.
+const startChoice = () => (state.product.signup_demo ? `<fieldset class="su-start"><legend>How do you want to start?</legend>
+  <label class="su-pick"><input type="radio" name="start_with" value="demo" checked><span><b>Demo ${esc(unit())}</b><small>Filled with sample stock, sales, customers and staff - explore everything first.</small></span></label>
+  <label class="su-pick"><input type="radio" name="start_with" value="empty"><span><b>Empty ${esc(unit())}</b><small>Start straight away with your own products and stock.</small></span></label></fieldset>` : "");
 const checklist = () => (state.product.signup_copy || {}).checklist
   || ["Add your logo, address and tax number in Setup", "Add your places (branches, stores)", "Invite your staff", "Add your first products"];
 const origin = () => location.origin;
@@ -113,6 +123,7 @@ function details(el) {
       <div class="su-row"><label>Mobile<input name="phone" type="tel" required autocomplete="tel" placeholder="${esc(COUNTRIES[pick][3])} mobile number"></label>
         <label>Email<input name="email" type="email" required autocomplete="email" placeholder="you@example.com"></label></div>
       <label>Password<input name="password" type="password" required minlength="8" autocomplete="new-password" placeholder="At least 8 characters"></label>
+      ${startChoice()}
       <label class="su-hp" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off"></label>
       <label class="su-check"><input type="checkbox" name="accept_terms" required> I agree to the terms of use and the privacy policy.</label>
       <span class="su-note bad" id="su-err" role="alert"></span>
@@ -201,13 +212,14 @@ async function after(el, r) {
   keep.set("");
   frame(el, 3, '<div class="su-wait">Setting things up...</div>');
   if (r.session && r.session.token) await login(r.session);
-  ready(el, { ...r.signup, slug: r.slug }, !!(r.session && r.session.token));
+  ready(el, { ...r.signup, slug: r.slug, start_with: r.start_with }, !!(r.session && r.session.token));
 }
 
 function ready(el, s, signedIn) {
   const page = `${origin()}/b/${s.slug}`, app = `${page}/app`;
   const card = frame(el, 4, `<div class="su-logo" style="width:56px;height:56px">${ICON.check}</div>
     <div><h2>${esc(s.business_name || "Your business")} is live</h2><p>Save these two links.</p></div>
+    ${state.product.signup_demo && s.start_with === "demo" ? `<p class="su-note">We are filling it with sample data now - it takes about a minute. Everything sample can be changed or deleted.</p>` : ""}
     <div class="su-out"><div><small>YOUR PUBLIC PAGE (share this)</small><code>${esc(page)}</code></div><button type="button" class="su-copy" data-copy="${esc(page)}">Copy</button></div>
     <div class="su-out"><div><small>YOUR APP (for you and your staff)</small><code>${esc(app)}</code></div><button type="button" class="su-copy" data-copy="${esc(app)}">Copy</button></div>
     <h3 style="margin:6px 0 0;font-size:16px">Your first steps</h3><ul class="su-list">${checklist().map((t) => `<li>${ICON.check} ${esc(t)}</li>`).join("")}</ul>

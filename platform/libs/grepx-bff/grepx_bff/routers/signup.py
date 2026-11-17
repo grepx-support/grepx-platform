@@ -16,6 +16,8 @@ A product includes signup.routers(section) - section: its deployment settings (s
 """
 from __future__ import annotations
 
+from typing import Any, Callable
+
 import grepx_contracts as gc
 from fastapi import APIRouter, Depends, Request
 
@@ -62,10 +64,18 @@ def operator(user: Principal = Depends(admin)) -> Principal:
     return user
 
 
-def routers(section: str) -> list[APIRouter]:
+def local_base(request: Request) -> str:
+    """This app as it can reach itself (the port it listens on), for work it does through its own API afterwards."""
+    server = request.scope.get("server") or ("127.0.0.1", 80)
+    return f"http://127.0.0.1:{server[1]}"
+
+
+def routers(section: str, after_open: Callable[[Any, dict, str], None] | None = None) -> list[APIRouter]:
+    """after_open(gw, opened, base_url): the product's next step once a business has opened - opened carries
+    business_id, owner_id, owner, name and start_with ("demo" / "empty"), e.g. fill a demo shop."""
     public, platform = APIRouter(prefix="/public", tags=["signup"]), APIRouter(prefix="/platform", tags=["signup"])
 
-    def finish(gw, signup_id: str) -> dict | None:
+    def finish(gw, signup_id: str, base: str = "") -> dict | None:
         """Both confirmed: set the business up once (BEGIN_SETUP lets exactly one caller through) and sign the owner in."""
         begin = _ask(gw, "BEGIN_SETUP", ok_only=False, signup_id=signup_id)
         if not begin.ok:
@@ -83,15 +93,17 @@ def routers(section: str) -> list[APIRouter]:
             _ask(gw, "FAIL", signup_id=signup_id, reason=(exc.detail or {}).get("reason", "") if isinstance(exc.detail, dict) else "")
             raise
         _ask(gw, "ACTIVATE", signup_id=signup_id, business_id=made["business_id"])
+        if after_open and base:
+            after_open(gw, {**made, "owner": owner, "name": signup["business_name"], "start_with": signup.get("start_with") or "demo"}, base)
         verdict = gw.command(gc.auth.REQUESTS, gc.auth.SERVICE, {"action": "LOGIN", "email": owner["email"],
                                                                 "password_enc": begin.fields["password_enc"], "remember": True})
-        return {**made, "slug": signup["slug"], "session": session(gw, verdict)}
+        return {**made, "slug": signup["slug"], "start_with": signup.get("start_with") or "demo", "session": session(gw, verdict)}
 
-    def answer(gw, verdict) -> dict:
+    def answer(gw, verdict, base: str = "") -> dict:
         signup = verdict.fields["signup"]
         out = {"signup": signup}
         if signup.get("stage") == "verified":
-            done = finish(gw, signup["signup_id"])
+            done = finish(gw, signup["signup_id"], base)
             if done:
                 out.update(done=True, signup={**signup, "stage": "active", "business_id": done["business_id"]}, **done)
         return out
@@ -112,7 +124,7 @@ def routers(section: str) -> list[APIRouter]:
             raise ApiError("ACCEPT_TERMS", 400)
         if email_in_use(gw, str(body.get("email") or "")):
             raise ApiError("EMAIL_IN_USE", 409, "This email already has an account here - sign in instead.")
-        fields = {k: str(body.get(k) or "") for k in ("business_name", "slug", "owner_name", "email", "phone", "currency", "timezone", "website")}
+        fields = {k: str(body.get(k) or "") for k in ("business_name", "slug", "owner_name", "email", "phone", "currency", "timezone", "website", "start_with")}
         verdict = _ask(gw, "START", **fields, product=str(gw.cfg.get("product") or ""), password_enc=gw.box.seal(password), ip=_ip(request),
                        link=f"{str(request.base_url).rstrip('/')}/#/signup/email")
         return {"signup": verdict.fields["signup"]}
@@ -125,17 +137,17 @@ def routers(section: str) -> list[APIRouter]:
         return {"signup": _mask(row)}
 
     @public.post("/signup/{signup_id}/email")
-    def confirm_email(signup_id: str, body: dict, gw=Depends(gateway)):
+    def confirm_email(signup_id: str, body: dict, request: Request, gw=Depends(gateway)):
         gw.limit(f"signup-email:{signup_id}", rate=10, per=60)
-        return answer(gw, _ask(gw, "CONFIRM_EMAIL", signup_id=signup_id, token=str(body.get("token") or "")))
+        return answer(gw, _ask(gw, "CONFIRM_EMAIL", signup_id=signup_id, token=str(body.get("token") or "")), local_base(request))
 
     @public.post("/signup/{signup_id}/phone")
-    def confirm_phone(signup_id: str, body: dict, gw=Depends(gateway)):
+    def confirm_phone(signup_id: str, body: dict, request: Request, gw=Depends(gateway)):
         gw.limit(f"signup-phone:{signup_id}", rate=10, per=60)
         verdict = _ask(gw, "CONFIRM_PHONE", signup_id=signup_id, code=str(body.get("code") or "").strip())
         if not verdict.fields.get("confirmed"):
             raise ApiError("WRONG_CODE", 400, f"That code is not right - {verdict.fields.get('tries_left', 0)} tries left.")
-        return answer(gw, verdict)
+        return answer(gw, verdict, local_base(request))
 
     @public.post("/signup/{signup_id}/resend")
     def resend(signup_id: str, body: dict, gw=Depends(gateway)):
@@ -143,9 +155,9 @@ def routers(section: str) -> list[APIRouter]:
         return {"signup": _ask(gw, "RESEND", signup_id=signup_id, what=what).fields["signup"]}
 
     @public.post("/signup/{signup_id}/finish")
-    def retry_finish(signup_id: str, gw=Depends(gateway)):
+    def retry_finish(signup_id: str, request: Request, gw=Depends(gateway)):
         """Both were confirmed but setting up did not finish (e.g. the page was closed): try again."""
-        done = finish(gw, signup_id)
+        done = finish(gw, signup_id, local_base(request))
         if done is None:
             raise ApiError("NOT_VERIFIED", 409)
         return {"done": True, **done}
