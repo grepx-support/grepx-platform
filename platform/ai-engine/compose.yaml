@@ -1,0 +1,36 @@
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+#
+# The GrepX AI engine: Ollama (free local models - one per project: grepx-kitchen, grepx-electronics, grepx-blood-donation)
+# and Open WebUI (a ChatGPT-style screen for the team). ai-service in every project talks to Ollama on 127.0.0.1:11434;
+# Ollama is not reachable from outside the server. Started by deploy.sh (docker compose -p grepx-ai).
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: grepx-ollama
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:11434:11434"
+    volumes:
+      - ollama:/root/.ollama
+    environment:
+      OLLAMA_KEEP_ALIVE: "24h"        # keep the model loaded: the first answer after a pause is otherwise slow
+      OLLAMA_NUM_PARALLEL: "2"
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: grepx-open-webui
+    restart: unless-stopped
+    depends_on: [ollama]
+    ports:
+      - "${WEBUI_PORT:-3000}:8080"
+    volumes:
+      - open-webui:/app/backend/data
+    environment:
+      OLLAMA_BASE_URL: "http://ollama:11434"
+      WEBUI_SECRET_KEY: "${WEBUI_SECRET_KEY}"
+      ENABLE_SIGNUP: "${WEBUI_SIGNUP:-true}"          # the first account becomes the admin; then set WEBUI_SIGNUP=false in .env
+      DEFAULT_MODELS: "${WEBUI_DEFAULT_MODEL:-grepx-electronics}"
+volumes:
+  ollama:
+  open-webui:

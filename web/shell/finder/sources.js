@@ -18,7 +18,7 @@ export class AiSource {
   async find(query) {
     if (!state.product?.ai || !state.me?.tenant || query.trim().split(/\s+/).length < 2) return [];
     return [{ title: `Ask AI: "${query.trim()}"`, hint: "Answered from your own data", icon: "sparkle", area: "#7c3aed", href: "",
-      run: () => window.grepxAssistant?.open(query.trim()) }];
+      run: () => { location.hash = `#/chat?ask=${encodeURIComponent(query.trim())}`; } }];
   }
 }
 

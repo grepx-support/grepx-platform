@@ -6,6 +6,7 @@
 
 // Skills every product gets: greetings and thanks, "what can you do", and opening any page by its name.
 import { api } from "../api.js";
+import { waitForJob } from "../../modules/business/lib/ai.js";
 import { state } from "../state.js";
 import { rank } from "../finder/score.js";
 import { words } from "./intent.js";
@@ -43,7 +44,9 @@ export const fallback = {
     const found = rank(t, pages(ctx)).slice(0, 4);
     if (state.product?.ai?.ask && t.trim().split(/\s+/).length >= 2) {      // a real question: the AI answers from this business's data
       const r = await api(state.product.ai.ask, { method: "POST", body: { question: t } }).catch(() => null);
-      if (r && r.ai) return { text: r.answer, links: found.slice(0, 2).map((p) => ({ label: p.title, href: p.href })), ai: true, fresh: false };
+      const j = r && r.job_id ? await waitForJob(r.job_id, { max: 120 }) : null;          // the AI answers as a job
+      if (j && j.state === "done") return { text: j.answer, links: [{ label: "Continue in AI chat", href: `#/chat?ask=${encodeURIComponent(t)}` }], ai: true, fresh: false };
+      if (j && j.why) return { text: j.why, links: found.map((p) => ({ label: p.title, href: p.href })), fresh: false };
       if (r && r.why) return { text: `${r.why} Here is what I can answer without it:`, links: found.map((p) => ({ label: p.title, href: p.href })), chips: me.suggestions(5), fresh: false };
     }
     return { text: found.length ? "I'm not sure what you mean - is it one of these pages? Or try a question below." : "I don't know that one yet. Here is what I can answer:",
