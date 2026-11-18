@@ -38,6 +38,7 @@ export { revealPasswords } from "./ui/password.js";
 export { canScan, scanBarcode, scanMany } from "./ui/scanner.js";
 export { code128Svg, code128Values } from "./ui/barcode.js";
 export { qrSvg } from "./ui/qr.js";
+export { hasWebGL, loadMapLibre } from "./map/maplibre.js";
 export { SignaturePad } from "./ui/signature-pad.js";
 export { empty, pageHead, pill, progress, steps, tabs } from "./ui/parts.js";
 export { avatar, avatarStack, initials, photoUrl } from "./profile/avatar.js";
