@@ -45,7 +45,8 @@ def reason_of(exc: ApiError) -> str:
     return exc.detail.get("reason", "") if isinstance(exc.detail, dict) else str(exc.detail)
 
 
-def router(dep: Callable, facts: Callable, brief: Callable, product: str, drafts: Callable | None = None, context: str = "", model: str = "") -> APIRouter:
+def router(dep: Callable, facts: Callable, brief: Callable, product: str, drafts: Callable | None = None, context: str = "", model: str = "",
+           about: Callable | None = None) -> APIRouter:
     r = APIRouter(prefix="/ai", tags=["ai"])
 
     def common(k, max_tokens: int = 700) -> dict:
@@ -53,6 +54,17 @@ def router(dep: Callable, facts: Callable, brief: Callable, product: str, drafts
         return {"product": product, "business": s.get("name", ""), "currency": s.get("currency", ""), "today": date.today().isoformat(),
                 "context": context, "model": model, "enabled": s.get("ai_enabled", True) is not False, "limit": int(s.get("ai_monthly_limit") or 300),
                 "max_tokens": max_tokens}
+
+    def data_for(k, body: dict) -> Any:
+        """The business's facts, plus - when the person picked some records first ("Ask AI" on a selection) - those
+        records in full: {kind, ids} -> the product's about(k, kind, ids). Only what this person may see."""
+        base = facts(k)
+        pick = body.get("about") or {}
+        if about and isinstance(pick, dict) and pick.get("kind") and pick.get("ids"):
+            ids = [str(i) for i in pick["ids"]][:50]
+            return {**base, "selected": {"kind": str(pick["kind"])[:30], "records": about(k, str(pick["kind"]), ids)},
+                    "note": "The person selected these records and asks about them first."}
+        return base
 
     def start(k, feature: str, question: str, data: Any, instructions: str, max_tokens: int = 700) -> dict:
         """{job_id} when the AI took it, else {why}: the screen shows the product's own words instead."""
@@ -87,7 +99,7 @@ def router(dep: Callable, facts: Callable, brief: Callable, product: str, drafts
         q = str(body.get("question") or "").strip()
         if not q:
             raise ApiError("NO_QUESTION", 400)
-        return start(k, "ask", q, facts(k), "Answer in at most 6 short lines; use bullet points for lists; name the numbers.")
+        return start(k, "ask", q, data_for(k, body), "Answer in at most 6 short lines; use bullet points for lists; name the numbers.")
 
     @r.get("/brief")
     def morning_brief(k=Depends(dep)):
@@ -136,7 +148,7 @@ def router(dep: Callable, facts: Callable, brief: Callable, product: str, drafts
         if not text:
             raise ApiError("NO_QUESTION", 400)
         try:
-            out = k.cmd(gc.ai.REQUESTS, gc.ai.SERVICE, {"action": "CHAT", "chat_id": str(body.get("chat_id") or ""), "message": text, "data": facts(k),
+            out = k.cmd(gc.ai.REQUESTS, gc.ai.SERVICE, {"action": "CHAT", "chat_id": str(body.get("chat_id") or ""), "message": text, "data": data_for(k, body),
                                                         "instructions": "Format answers in short paragraphs or bullet points. Name the numbers.", **common(k)})
         except ApiError as exc:
             if reason_of(exc) in WHY:

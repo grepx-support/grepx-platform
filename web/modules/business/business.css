@@ -250,7 +250,7 @@
 .ch-list a:hover { background: color-mix(in srgb, var(--text, #0f172a) 6%, transparent); } .ch-list a.on { background: color-mix(in srgb, #7c3aed 14%, transparent); font-weight: 600; }
 .ch-dot { width: 8px; height: 8px; border-radius: 50%; background: #7c3aed; animation: ch-pulse 1s infinite alternate; }
 .ch-model { margin: 0; display: flex; gap: 6px; align-items: center; }
-.ch-main { display: grid; grid-template-rows: 1fr auto auto; min-height: 0; }
+.ch-main { display: flex; flex-direction: column; min-height: 0; } .ch-main > .ch-thread { flex: 1; min-height: 0; }
 .ch-thread { overflow: auto; padding: 24px max(16px, calc((100% - 780px) / 2)); display: grid; gap: 18px; align-content: start; }
 .ch-msg { display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 12px; animation: ch-in .25s ease-out; }
 .ch-av { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; background: var(--bg-2, #f1f5f9); }
@@ -280,3 +280,10 @@
 body.on-chat .as-fab { display: none !important; }
 @media (max-width: 760px) { .ch-new { flex: none; align-self: center; padding: 8px 12px; } .ch-side { align-items: center; } }
 @media (max-width: 760px) { .ch { grid-template-rows: auto minmax(0, 1fr); } .ch-side { height: auto; } .ch-list { overflow-x: auto; overflow-y: hidden; } }
+/* chat: what it is about (a selection), and ready questions above the box */
+.ch-about { display: flex; gap: 6px; align-items: center; padding: 8px 12px; margin: 0 0 6px; border-radius: 12px; font-size: .88rem;
+  background: color-mix(in srgb, #7c3aed 9%, transparent); color: #6d28d9; }
+.ch-about a { margin-left: auto; color: inherit; display: inline-flex; }
+.ch-ready { display: flex; gap: 6px; overflow-x: auto; padding: 4px 2px 8px; scrollbar-width: thin; }
+.ch-ready .ch-sug { flex: none; padding: 6px 12px; border-radius: 999px; font-size: .82rem; white-space: nowrap; }
+.ch-thread:has(.ch-empty) + .ch-ready { display: none; }

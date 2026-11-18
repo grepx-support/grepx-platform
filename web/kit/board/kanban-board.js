@@ -16,7 +16,8 @@ import { DragController } from "../dnd/drag-controller.js";
 
 export class KanbanBoard extends Component {
   /** props: { columns: [{id, title, icon, color, accepts?(card, from), hint}], cards: [{id, column, ...}],
-   *           card(card) -> markup, onMove(card, from, to) -> Promise<boolean>, onOpen?(card, element), empty: text } */
+   *           card(card) -> markup, onMove(card, from, to) -> Promise<boolean>, onOpen?(card, element), empty: text,
+   *           onDragStart?(card, board), onDragEnd?(card, board) - e.g. light up the columns that suit the card } */
   render() {
     const { columns, cards, empty = "Nothing here" } = this.props;
     return html`<div class="kit-board" style="--cols:${columns.length}">${columns.map((col) => {
@@ -41,9 +42,12 @@ export class KanbanBoard extends Component {
 
   mounted() {
     const drag = new DragController(this.el, { handle: ".kit-kcard", target: ".kit-kcol", scope: this.el });
+    const cardOf = (d) => this.props.cards.find((c) => c.id === d.source.dataset.id);
+    drag.on("start", (d) => this.props.onDragStart?.(cardOf(d), this.el));
     drag.on("over", (d) => { this.mark(d); this.gap(d); });
     drag.on("drop", (d) => { this.move(d.source.dataset.id, d.over.dataset.col); d.landAt = this.el.querySelector(`[data-id="${CSS.escape(d.source.dataset.id)}"]`); });
-    drag.on("end", () => {
+    drag.on("end", (d) => {
+      this.props.onDragEnd?.(cardOf(d), this.el);
       this.el.querySelectorAll(".kit-refuse").forEach((c) => c.classList.remove("kit-refuse"));
       this.el.querySelectorAll(".kit-kgap").forEach((g) => g.remove());
     });
