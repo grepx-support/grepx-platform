@@ -4,8 +4,8 @@
  * Unauthorised copying, use, modification or distribution is strictly prohibited.
  */
 
-// QR codes as SVG (a link on a printed card, a warranty, a job slip) - qrcode-generator (MIT, web/external/) does the encoding.
-import qrcode from "../../external/qrcode.js";
+// QR codes as SVG (a link on a printed card, a warranty, a job slip) - qrcode-generator (MIT, web/vendor/ - also used for two-step login) does the encoding.
+import qrcode from "../../vendor/qrcode.js";
 import { raw } from "../core/dom.js";
 
 /** qrSvg("https://...", { size: 120, label: "Scan to track" }) -> markup; error correction M, black on white. */

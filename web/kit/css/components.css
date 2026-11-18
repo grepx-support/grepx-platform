@@ -189,3 +189,15 @@ a.kit-hit > rect[rx] { transition: opacity .15s; } a.kit-hit:hover > rect[rx] { 
 .kit-chart svg { max-height: 300px; }                                    /* a chart in a wide card does not grow into a wall */
 .kit-row-link { cursor: pointer; } .kit-row-link:hover td, .kit-row-link:focus-visible td { background: color-mix(in srgb, var(--primary) 7%, transparent); }
 .kit-kcard { cursor: pointer; }
+
+/* phones: charts, KPIs and legends stay inside their card */
+.kit-donut > * { min-width: 0; } .kit-legend span { min-width: 0; } .kit-legend span > :not(i):not(b) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.kit-kpi > * { min-width: 0; } .kit-kpi-value { overflow-wrap: anywhere; }
+@media (max-width: 600px) {
+  .kit-donut { grid-template-columns: 96px minmax(0, 1fr); gap: 10px; }
+  .kit-kpi-value { font-size: clamp(1.05rem, 5.2vw, 1.5rem); }
+}
+.kit-install { position: fixed; left: 10px; right: 10px; bottom: calc(92px + env(safe-area-inset-bottom)); z-index: 60; display: flex; gap: 8px; align-items: center;
+  padding: 10px 10px 10px 14px; border-radius: 16px; background: var(--card, #fff); color: var(--ink, #0f172a); box-shadow: 0 16px 40px rgb(15 23 42 / .22);
+  border: 1px solid var(--line, #e5e7eb); font-size: 13px; animation: kit-rise .3s ease; }
+.kit-install span { flex: 1; } @keyframes kit-rise { from { opacity: 0; transform: translateY(10px); } }

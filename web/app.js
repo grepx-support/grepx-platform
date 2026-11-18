@@ -17,6 +17,7 @@ import { startAssistant } from "./shell/assistant/index.js";
 import { startExpand } from "./shell/expand.js";
 import { startFinder } from "./shell/finder/index.js";
 import { startTabbar } from "./shell/tabbar.js";
+import { setupInstall } from "./shell/install.js";
 import { enterSupport, exitSupport, supportBanner } from "./shell/support.js";
 import { toast } from "./shell/toast.js";
 
@@ -62,6 +63,8 @@ async function boot() {
   theme.apply();
   state.product = await (await fetch("/product.json")).json();
   brand(state.product);
+  setupInstall(state.product.name);                   // installable on phones (every feature), offline page
+  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", state.product.theme?.primary || "#4f46e5");
   frame();
   // All modules download at once (not one after another); routes keep product.json's order. One module that fails to
   // load (an old or missing file on the server) never blanks the app: the rest works and a banner names what failed.

@@ -24,6 +24,6 @@
     font: 600 11px/1.1 inherit; text-decoration: none; border-radius: 12px; min-height: 52px; }
   .kit-tabbar a.on { color: var(--primary, #2563eb); background: color-mix(in srgb, var(--primary, #2563eb) 10%, transparent); }
   body:has(.kit-tabbar:not([hidden])) .main { padding-bottom: 84px; }
-  body:has(.kit-tabbar:not([hidden])) .as-fab { bottom: 88px; }
+  body:has(.kit-tabbar:not([hidden])) .as-fab { bottom: 88px; width: 46px; height: 46px; }   /* smaller on phones: covers less of the page */
 }
 

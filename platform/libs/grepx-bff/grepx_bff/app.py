@@ -74,6 +74,9 @@ def create_app(gw: Gateway, product_routers: Iterable[APIRouter], title: str, we
             app.mount(f"/assets/modules/{product}", StaticFiles(directory=product_dir / "modules"), name="product-web")
         app.mount("/assets", StaticFiles(directory=web_dir), name="web")
 
+        from .pwa import mount_pwa                         # installable as a phone app: manifest, icon, service worker
+        mount_pwa(app, lambda: product_dir / "product.json" if product_dir is not None else web_dir / "products" / f"{product}.json")
+
         @app.get("/product.json", include_in_schema=False)
         def product_config():
             return FileResponse(product_dir / "product.json" if product_dir is not None else web_dir / "products" / f"{product}.json")
