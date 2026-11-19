@@ -7,6 +7,7 @@
 // The chat window: a glowing button bottom-right, a panel with the conversation (kept for this browser tab), a typing
 // indicator, suggestion chips and the box to type in. Ctrl+J (or Cmd+J) opens and closes it.
 import { html, icon } from "../../kit/index.js";
+import { api } from "../api.js";
 import { replyView } from "./view.js";
 
 const KEY = "assistant.chat";
@@ -38,8 +39,10 @@ export class ChatPanel {
     this.el.querySelector("[data-clear]").onclick = () => { this.log = []; keep(this.log); this.brain.forget(); this.paint(); };
     this.el.querySelector("form").onsubmit = (e) => { e.preventDefault(); this.ask(this.input.value); };
     this.list.addEventListener("click", (e) => {
-      const ask = e.target.closest("[data-ask]");
-      if (ask) this.ask(ask.dataset.ask);
+      const ask = e.target.closest("[data-ask]"), go = e.target.closest("[data-do]"), no = e.target.closest("[data-dont]");
+      if (go) this.act(Number(go.dataset.do));
+      else if (no) { this.log[Number(no.dataset.dont)].reply.confirm.state = "no"; keep(this.log); this.paint(); }
+      else if (ask) this.ask(ask.dataset.ask);
       else if (e.target.closest("a[href^='#']") && innerWidth < 760) this.toggle(false);
     });
     window.addEventListener("keydown", (e) => {
@@ -60,10 +63,28 @@ export class ChatPanel {
   paint(thinking = false) {
     const fresh = this.log.length - (thinking ? 1 : 2);                        // only the newest messages slide in
     this.list.innerHTML = this.log.map((m, i) => {
-      const bubble = m.who === "me" ? `<div class="as-me">${html`${m.text}`.text}</div>` : String(replyView(m.reply));
+      const bubble = m.who === "me" ? `<div class="as-me">${html`${m.text}`.text}</div>` : String(replyView(m.reply, i));
       return i < fresh ? bubble.replace(/class="as-(me|reply)/, 'class="as-old as-$1') : bubble;
     }).join("") + (thinking ? '<div class="as-typing"><i></i><i></i><i></i></div>' : "");
     this.list.scrollTop = this.list.scrollHeight;
+  }
+
+  /** The person said "Do it": run the action the reply described (the app's own API), show what happened. */
+  async act(at) {
+    const c = this.log[at]?.reply?.confirm;
+    if (!c || c.state) return;
+    c.state = "running";
+    this.paint();
+    try {
+      const out = await api(c.path, { method: c.method || "POST", body: c.body || {} });
+      Object.assign(c, { state: "done", result: typeof c.done === "string" ? c.done : (out && out.message) || "Done", error: "" });
+      this.brain.forget();                                     // answers made before the change are out of date
+      if (c.go) location.hash = c.go;
+    } catch (e) {
+      Object.assign(c, { state: "", error: e.message || "That did not work" });
+    }
+    keep(this.log);
+    this.paint();
   }
 
   async ask(text) {

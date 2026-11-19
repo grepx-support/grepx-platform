@@ -5,7 +5,8 @@
  */
 
 // How a reply looks in the chat: its text, number tiles, a list of things (each can open a page or ask again),
-// links and suggestion chips. Pure markup.
+// links, suggestion chips, and an action to confirm (confirm: {title, text, ok} - "Do it" runs it, nothing before).
+// Pure markup.
 import { html, icon } from "../../kit/index.js";
 
 const tile = (k) => html`<${k.href ? "a" : "div"} class="as-kpi ${k.tone || ""}" ${k.href ? html`href="${k.href}"` : ""}><small>${k.label}</small><b>${k.value}</b></${k.href ? "a" : "div"}>`;
@@ -16,11 +17,18 @@ const item = (it) => {
   return it.href ? html`<a class="as-row" href="${it.href}">${inner}${icon("arrow", { size: 14 })}</a>` : html`<div class="as-row">${inner}</div>`;
 };
 
-export function replyView(r) {
+const confirmCard = (c, at) => (c.state === "done" ? html`<div class="as-confirm done">${icon("check", { size: 14 })} ${c.result || "Done"}</div>`
+  : c.state === "no" ? html`<div class="as-confirm no">Not done.</div>`
+  : html`<div class="as-confirm"><b>${c.title}</b>${c.text ? html`<p>${c.text}</p>` : ""}${c.error ? html`<p class="bad">${c.error}</p>` : ""}
+    <div><button type="button" class="as-do" data-do="${at}">${icon("check", { size: 14 })} ${c.ok || "Do it"}</button>
+    <button type="button" data-dont="${at}">Not now</button></div></div>`);
+
+export function replyView(r, at = -1) {
   return html`<div class="as-reply ${r.tone || ""}"><p>${r.text}</p>
     ${r.kpis?.length ? html`<div class="as-kpis">${r.kpis.map(tile)}</div>` : ""}
     ${r.items?.length ? html`<div class="as-items">${r.items.slice(0, 8).map(item)}${r.items.length > 8 ? html`<small class="muted">and ${r.items.length - 8} more</small>` : ""}</div>` : ""}
     ${r.links?.length ? html`<div class="as-links">${r.links.map((l) => html`<a class="as-link" href="${l.href}">${icon("arrow", { size: 13 })} ${l.label}</a>`)}</div>` : ""}
+    ${r.confirm ? confirmCard(r.confirm, at) : ""}
     ${r.chips?.length ? html`<div class="as-chips">${r.chips.map((c) => html`<button type="button" data-ask="${c}">${c}</button>`)}</div>` : ""}
     ${r.cached ? html`<small class="as-cached" title="Answered from the last minute's data">${icon("bolt", { size: 11 })} instant</small>` : ""}</div>`;
 }

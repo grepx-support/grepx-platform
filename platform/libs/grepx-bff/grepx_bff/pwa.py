@@ -30,6 +30,23 @@ self.addEventListener("fetch", (e) => {
         { headers: { "Content-Type": "text/html" } })));
   }
 });
+// Web Push: a message from the platform (the "app" channel) shows as a phone / desktop notification; a tap opens it.
+self.addEventListener("push", (e) => {
+  let m = {};
+  try { m = e.data ? e.data.json() : {}; } catch { m = { body: e.data && e.data.text() }; }
+  e.waitUntil(self.registration.showNotification(m.title || "New message", { body: m.body || "", data: { url: m.url || "/" },
+    icon: "/app-icon.svg", badge: "/app-icon.svg", tag: m.tag || undefined }));
+});
+self.addEventListener("notificationclick", (e) => {
+  e.notification.close();
+  const url = new URL((e.notification.data && e.notification.data.url) || "/", self.location.origin);
+  const target = url.hash ? `/${url.hash}` : url.pathname;
+  e.waitUntil(self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((wins) => {
+    const w = wins.find((x) => x.url.startsWith(self.location.origin));
+    if (w) { w.focus(); return w.navigate(target); }
+    return self.clients.openWindow(target);
+  }));
+});
 """
 
 
