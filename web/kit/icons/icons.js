@@ -74,6 +74,8 @@ const ICONS = {
   bolt: "M13 2L4 14h7l-1 8 9-12h-7z",
   receipt: "M5 3h14v18l-3-2-2 2-2-2-2 2-2-2-3 2zM9 8h6M9 12h6M9 16h4",
   download: "M12 4v12M7 11l5 5 5-5M4 20h16",
+  file: "M14 3H6v18h12V7zM14 3v4h4M9 13h6M9 17h6",
+  bell: "M6 16V11a6 6 0 0 1 12 0v5l2 2H4zM10 21h4",
   command: "M9 6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3z",
   expand: "M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5",
   star: "M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z",

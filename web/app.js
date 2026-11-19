@@ -14,6 +14,7 @@ import { route } from "./shell/router.js";
 import { can, loadMe, login, logout, onSessionChange } from "./shell/session.js";
 import { state } from "./shell/state.js";
 import { startAssistant } from "./shell/assistant/index.js";
+import { startBell } from "./shell/bell.js";
 import { startExpand } from "./shell/expand.js";
 import { startFinder } from "./shell/finder/index.js";
 import { startTabbar } from "./shell/tabbar.js";
@@ -78,6 +79,7 @@ async function boot() {
   safely("chart expand", () => startExpand());
   safely("assistant", () => startAssistant(modules));
   safely("tab bar", () => onSessionChange(startTabbar()));
+  safely("bell", () => onSessionChange(startBell(document.querySelector("#bell"))));
   onSessionChange(renderNav);
   onSessionChange(supportBanner);
   onUnauthorized(async () => { if (!(await exitSupport())) logout(); });   // an expired support session goes back, not out
