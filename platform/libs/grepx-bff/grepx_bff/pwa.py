@@ -9,11 +9,12 @@ It never stores business data: /api/ always goes to the server."""
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 from typing import Callable
 
 from fastapi import FastAPI
-from fastapi.responses import JSONResponse, Response
+from fastapi.responses import FileResponse, JSONResponse, Response
 
 SW = """// GrepX app shell - caches this build's files (/assets/v/<build>/, they never change) and the page; never /api/.
 const SHELL = "grepx-shell-v1";
@@ -83,6 +84,16 @@ def mount_pwa(app: FastAPI, product_json: Callable[[], Path]) -> None:
         p = product()
         return Response(_icon(p.get("logo") or "✦", ((p.get("theme") or {}).get("primary")) or "#4f46e5"), media_type="image/svg+xml",
                         headers={"Cache-Control": "public, max-age=86400"})
+
+    @app.get("/app.apk", include_in_schema=False)
+    def android_app():
+        """The Android app built on this server (scripts/run.sh apk) - phones download it from here."""
+        built = sorted((Path(os.environ.get("GREPX_HOME") or ".") / "build" / "mobile").glob("*.apk"), key=lambda f: f.stat().st_mtime)
+        if not built:
+            return Response("The Android app is not built yet - on the server run: scripts/run.sh apk", status_code=404, media_type="text/plain")
+        name = (product().get("short_name") or (product().get("name") or "app").replace("GrepX ", "")).replace(" ", "-")
+        return FileResponse(built[-1], media_type="application/vnd.android.package-archive", filename=f"{name}.apk",
+                            headers={"Cache-Control": "no-cache"})
 
     @app.get("/sw.js", include_in_schema=False)
     def service_worker():

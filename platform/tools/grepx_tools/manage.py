@@ -27,6 +27,7 @@
     scripts/run.sh targets               # refresh Prometheus targets from heartbeats
     scripts/run.sh demo [ARGS]           # optional demo data: runs the product's demo/seed.py (see its --help)
     scripts/run.sh dbview [start|stop|status|list]  # read-only web viewer of Nexus + every service database (Datasette)
+    scripts/run.sh apk [URL|tools]       # the product's Android app (APK) built here; phones get it at <site>/app.apk
 Logs: logs/<name>.log   PIDs: run/<name>.pid
 """
 from __future__ import annotations
@@ -116,6 +117,7 @@ COMMANDS = {
     "restart": lambda a: restart(a[0] if a else "all"),
     "status": lambda a: status_all(a[0] if a else ""),
     "dbview": lambda a: __import__("dbview").main(a),
+    "apk": lambda a: tool("mobile.py", *a),
     "demo": demo,
     "targets": lambda a: targets_file(),
     "logs": logs,
