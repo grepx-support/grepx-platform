@@ -17,7 +17,7 @@ def test_owned_tables_exclude_request_tables():
     common = {k: {**v, "enabled": True} for k, v in known_services().items() if k in ("event-service", "people-service", "notification-service")}
     owners = nexus_accounts.ownership(common)
     assert owners["event-service"] == ["events"] and owners["people-service"] == ["people"]
-    assert owners["notification-service"] == []          # `notifications` is its request table: everyone submits there
+    assert "notifications" not in owners["notification-service"]   # its request table: everyone submits there (it owns only its device and inbox tables)
     all_owned = [t for tables in owners.values() for t in tables]
     assert len(all_owned) == len(set(all_owned)), "a table must have one owner"
 
