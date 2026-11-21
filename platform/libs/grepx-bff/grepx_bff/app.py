@@ -5,6 +5,9 @@
 """create_app — one FastAPI app per product: common routers + the product's own, one trace id per request."""
 from __future__ import annotations
 
+import logging
+import os
+import time
 from pathlib import Path
 from typing import Iterable, Optional
 
@@ -15,6 +18,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.responses import FileResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 from grepx_service import new_key
+from starlette.concurrency import run_in_threadpool
 
 from .gateway import CURRENT_TRACE, Gateway
 from .routers import COMMON_ROUTERS
@@ -32,11 +36,12 @@ def create_app(gw: Gateway, product_routers: Iterable[APIRouter], title: str, we
 
     @app.middleware("http")
     async def trace_and_headers(request, call_next):
+        started = time.perf_counter()
         versioned = request.scope["path"].startswith(VERSIONED)
         if versioned:                                  # /assets/v/<build>/x -> /assets/x (the build is only for the browser's cache)
             tag, _, rest = request.scope["path"][len(VERSIONED):].partition("/")
             request.scope["path"] = "/assets/" + rest
-            if tag == build.tag():
+            if tag == await run_in_threadpool(build.tag):  # it reads the web folder: never on the event loop
                 request.scope["grepx.immutable"] = True
         trace_id = "".join(c for c in request.headers.get("x-trace-id", "") if c.isalnum() or c in "-_")[:64] or new_key()
         token = CURRENT_TRACE.set(trace_id)
@@ -45,6 +50,10 @@ def create_app(gw: Gateway, product_routers: Iterable[APIRouter], title: str, we
         finally:
             CURRENT_TRACE.reset(token)
         response.headers["X-Trace-Id"] = trace_id
+        took = (time.perf_counter() - started) * 1000
+        response.headers["Server-Timing"] = f"app;dur={took:.0f}"                 # the browser's Network tab shows it
+        if took > SLOW_MS and request.scope["path"].startswith("/api/"):
+            slow_log.warning("slow %s %s %.0f ms trace=%s", request.method, request.scope["path"], took, trace_id)
         if request.scope.get("grepx.immutable"):
             response.headers["Cache-Control"] = "public, max-age=31536000, immutable"      # this build's file never changes
         elif "cache-control" not in response.headers:
@@ -88,6 +97,8 @@ def create_app(gw: Gateway, product_routers: Iterable[APIRouter], title: str, we
 
 
 VERSIONED = "/assets/v/"
+SLOW_MS = float(os.environ.get("GREPX_SLOW_MS", "1000"))        # API calls slower than this are logged (grepx.slow)
+slow_log = logging.getLogger("grepx.slow")
 
 
 class WebBuild:

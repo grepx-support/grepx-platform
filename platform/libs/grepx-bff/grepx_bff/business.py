@@ -44,6 +44,12 @@ class Business:
         return self.gw.command(table, service, {**fields, "tenant_id": self.tenant, "actor_id": self.user.user_id,
                                                 "actor_name": self.name}, key=key).fields
 
+    def cmds(self, *calls: tuple[str, str, dict]) -> list[dict]:
+        """Independent commands at once - k.cmds((table, service, fields), ...) -> their answers in order: a dashboard
+        waits for the slowest answer, not for each in turn."""
+        mine = {"tenant_id": self.tenant, "actor_id": self.user.user_id, "actor_name": self.name}
+        return [v.fields for v in self.gw.commands([(t, s, {**f, **mine}) for t, s, f in calls])]
+
     def rows(self, table: str, criteria: str = "", **eq) -> list[dict]:
         return self.gw.rows(table, criteria, tenant_id=self.tenant, **eq)
 

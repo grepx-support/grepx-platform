@@ -40,14 +40,30 @@ class Gateway:
         self.limits: dict[str, RateLimiter] = {}
 
     def command(self, table: str, service: str, fields: dict, key: Optional[str] = None, ok_only: bool = True) -> Verdict:
-        generic = self.vocab.speaks(table)
-        sent = self.vocab.fields_in(fields) if generic else fields
         try:
-            verdict = self.breaker.call(lambda: self.requests.call(table, service, {"tenant_id": self.tenant, **sent}, key=key,
+            verdict = self.breaker.call(lambda: self.requests.call(table, service, self._out(table, fields), key=key,
                                                                    trace_id=CURRENT_TRACE.get() or None))
         except CircuitOpen:
             raise ApiError("SERVICE_UNAVAILABLE", 503)
-        if generic:
+        return self._back(table, verdict, ok_only)
+
+    def commands(self, calls: list[tuple[str, str, dict]], ok_only: bool = True) -> list[Verdict]:
+        """Independent commands at once - [(table, service, fields), ...] -> their verdicts in order. A screen that
+        needs several answers (a dashboard) waits for the slowest one instead of each in turn."""
+        if not calls:
+            return []
+        try:
+            verdicts = self.breaker.call(lambda: self.requests.call_many([(t, s, self._out(t, f)) for t, s, f in calls],
+                                                                         trace_id=CURRENT_TRACE.get() or None))
+        except CircuitOpen:
+            raise ApiError("SERVICE_UNAVAILABLE", 503)
+        return [self._back(t, v, ok_only) for (t, _, _), v in zip(calls, verdicts)]
+
+    def _out(self, table: str, fields: dict) -> dict:
+        return {"tenant_id": self.tenant, **(self.vocab.fields_in(fields) if self.vocab.speaks(table) else fields)}
+
+    def _back(self, table: str, verdict: Verdict, ok_only: bool) -> Verdict:
+        if self.vocab.speaks(table):
             verdict = Verdict(verdict.ok, verdict.key, self.vocab.fields_out(verdict.fields))
         if ok_only and not verdict.ok:
             raise ApiError(verdict.reason, 504 if verdict.reason.endswith("_TIMEOUT") else 409, str(verdict.fields.get("detail") or ""))

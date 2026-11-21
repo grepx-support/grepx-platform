@@ -25,8 +25,8 @@ def _ask(gw, user: Principal, action: str, **fields) -> dict:
 def inbox(limit: int = 30, user: Principal = Depends(current_user), gw=Depends(gateway)):
     """{items: [{key, subject, body, link, at, new}], unread} - newest first."""
     seen = (gw.read.one(gc.notification.INBOX_SEEN, user.user_id) or {}).get("seen_until", "")
-    rows = [n for n in gw.read.rows(gc.notification.NOTIFICATIONS, channel="app")
-            if n.get("recipient") == user.user_id and n.get("delivery") in ("SENT", "LOGGED")]
+    rows = [n for n in gw.read.rows(gc.notification.NOTIFICATIONS, channel="app", recipient=user.user_id)   # only theirs, on the server
+            if n.get("delivery") in ("SENT", "LOGGED")]
     rows.sort(key=lambda n: n.get("sent_at") or n.get("occurred_at", ""), reverse=True)
     items = [{"key": n.get("_key", ""), "subject": n.get("subject", ""), "body": n.get("body", ""), "template": n.get("template", ""),
               "link": (n.get("values") or {}).get("link", ""), "at": n.get("sent_at") or n.get("occurred_at", ""),

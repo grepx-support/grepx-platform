@@ -46,20 +46,38 @@ class RequestClient:
         return key
 
     def wait(self, table: str, key: str, timeout: Optional[float] = None) -> Verdict:
+        return self.wait_many([(table, key)], timeout)[0]
+
+    def wait_many(self, pending: list[tuple[str, str]], timeout: Optional[float] = None) -> list[Verdict]:
+        """The answers to requests already sent, in their order. Looks again soon, then less often (2 ms, 4, 8 ...
+        up to the interval): most answers come in a few milliseconds, and a fixed 50 ms step made every call pay it."""
         deadline = time.time() + (timeout or self.timeout)
-        criteria = f"transaction_id = {quote(key)}"
-        last: dict = {}
+        done: dict[int, Verdict] = {}
+        last: dict[int, dict] = {}
+        delay = min(0.002, self.interval)
         while time.time() < deadline:
             drain = getattr(self.client, "drain", None)
             if drain:
                 drain()
-            rows = self.client.select(table, criteria)
-            if rows:
-                last = dict(rows[0].fields)
-                if last.get(RowField.STATUS.value) in TERMINAL:
-                    return Verdict(last[RowField.STATUS.value] == RowStatus.ACCEPTED.value, key, last)
-            time.sleep(self.interval)
-        return Verdict(False, key, {**last, "reason": f"{table.upper()}_TIMEOUT"})
+            for i, (table, key) in enumerate(pending):
+                if i in done:
+                    continue
+                rows = self.client.select(table, f"transaction_id = {quote(key)}")
+                if rows:
+                    last[i] = dict(rows[0].fields)
+                    if last[i].get(RowField.STATUS.value) in TERMINAL:
+                        done[i] = Verdict(last[i][RowField.STATUS.value] == RowStatus.ACCEPTED.value, key, last[i])
+            if len(done) == len(pending):
+                break
+            time.sleep(delay)
+            delay = min(self.interval, delay * 2)
+        return [done.get(i) or Verdict(False, key, {**last.get(i, {}), "reason": f"{table.upper()}_TIMEOUT"}) for i, (table, key) in enumerate(pending)]
+
+    def call_many(self, calls: list[tuple[str, str, dict]], timeout: Optional[float] = None, trace_id: Optional[str] = None) -> list[Verdict]:
+        """Several independent requests at once - (table, to_service, fields) each - sent together and waited for
+        together, so a page that needs five answers waits for the slowest, not for the sum."""
+        keys = [self.send(table, to_service, fields, None, trace_id) for table, to_service, fields in calls]
+        return self.wait_many([(table, key) for (table, _, _), key in zip(calls, keys)], timeout)
 
     def call(self, table: str, to_service: str, fields: dict, key: Optional[str] = None, timeout: Optional[float] = None,
              trace_id: Optional[str] = None) -> Verdict:
