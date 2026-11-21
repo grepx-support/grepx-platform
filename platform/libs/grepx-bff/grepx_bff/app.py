@@ -5,11 +5,14 @@
 """create_app — one FastAPI app per product: common routers + the product's own, one trace id per request."""
 from __future__ import annotations
 
+import json
 import logging
 import os
+import posixpath
+import re
 import time
 from pathlib import Path
-from typing import Iterable, Optional
+from typing import Callable, Iterable, Optional
 
 from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -32,7 +35,9 @@ def create_app(gw: Gateway, product_routers: Iterable[APIRouter], title: str, we
     app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"], expose_headers=["X-Trace-Id"])
     app.add_middleware(GZipMiddleware, minimum_size=1024, compresslevel=6)     # modules, styles and big lists: about a quarter of the bytes
 
-    build = WebBuild([d for d in (web_dir, product_dir) if d is not None])
+    product_json = (lambda: product_dir / "product.json") if product_dir is not None else (lambda: web_dir / "products" / f"{product}.json")
+    mounts = {**({f"/assets/modules/{product}/": product_dir / "modules"} if product_dir is not None else {}), "/assets/": web_dir}
+    build = WebBuild([d for d in (web_dir, product_dir) if d is not None], mounts if web_dir is not None else {}, product_json)
 
     @app.middleware("http")
     async def trace_and_headers(request, call_next):
@@ -99,16 +104,23 @@ def create_app(gw: Gateway, product_routers: Iterable[APIRouter], title: str, we
 VERSIONED = "/assets/v/"
 SLOW_MS = float(os.environ.get("GREPX_SLOW_MS", "1000"))        # API calls slower than this are logged (grepx.slow)
 slow_log = logging.getLogger("grepx.slow")
+log = logging.getLogger("grepx.web")
 
 
 class WebBuild:
     """The web app is ~200 small ES modules. Asking for each on every load (304s) is slow over a long link, and caching
     them plainly risks mixing old and new modules after an update. So the page names a build - a hash of every web
     file's size and time - and an import map sends every /assets/ import to /assets/v/<build>/, cached for good; the
-    next update is a new build, new URLs. Checked at most every few seconds, so an edited file shows on the next load."""
+    next update is a new build, new URLs. Checked at most every few seconds, so an edited file shows on the next load.
 
-    def __init__(self, roots: list[Path]):
+    A first visit is the slow one: the browser found the modules a layer at a time (app.js -> product.json -> every
+    page module -> what each imports...), one round trip per layer. So the page also lists every module it will need
+    (modulepreload - fetched all at once from the start) and carries product.json inside it (one round trip less)."""
+
+    def __init__(self, roots: list[Path], mounts: Optional[dict] = None, product_json: Optional[Callable[[], Path]] = None):
         self.roots, self._tag, self._at = roots, "", 0.0
+        self.mounts, self.product_json = mounts or {}, product_json
+        self._head: tuple[str, str] = ("", "")
 
     def tag(self) -> str:
         import hashlib
@@ -126,6 +138,52 @@ class WebBuild:
     def index(self, path: Path) -> str:
         v = f"{VERSIONED}{self.tag()}/"
         importmap = ('<script type="importmap">{"imports": {"/assets/v/": "/assets/v/", "/assets/": "%s"}}</script>' % v)
+        importmap += self.head(v)
         html = path.read_text(encoding="utf-8")
         html = html.replace('<link rel="stylesheet" href="/assets/ui.css">', f'<link rel="stylesheet" href="{v}ui.css">')
         return html.replace('<script type="module" src="/assets/app.js"></script>', f'{importmap}\n  <script type="module" src="{v}app.js"></script>')
+
+    def head(self, v: str) -> str:
+        """product.json inline and a modulepreload for every module the app imports at start - worked out once a build."""
+        if self._head[0] == v or not self.mounts or self.product_json is None:
+            return self._head[1] if self._head[0] == v else ""
+        try:
+            product = json.loads(self.product_json().read_text(encoding="utf-8"))
+            starts = ["/assets/app.js", *(f"/assets/modules/{m}.js" for m in product.get("modules") or [])]
+            links = "".join(f'<link rel="modulepreload" href="{v}{url[len("/assets/"):]}">' for url in module_graph(starts, self.mounts))
+            inline = "<script>window.GREPX_PRODUCT = %s;</script>" % json.dumps(product).replace("</", "<\\/")
+            self._head = (v, f"\n  {inline}\n  {links}")
+        except Exception as exc:                          # a page that still works the slow way beats no page
+            log.warning("web: no preload list (%s)", exc)
+            self._head = (v, "")
+        return self._head[1]
+
+
+IMPORTS = re.compile(r"""(?:^|[;\s])(?:import|export)\s*(?:[\w*{}\s,$]*?\sfrom\s*)?["']([^"']+\.js)["']""", re.M)
+
+
+def module_graph(starts: list[str], mounts: dict) -> list[str]:
+    """Every module reachable by static imports from `starts` (URLs under /assets/), in the order found. Dynamic
+    import() is left to load when it is needed."""
+    def file_of(url: str) -> Optional[Path]:
+        for prefix, root in mounts.items():
+            if url.startswith(prefix):
+                return Path(root) / url[len(prefix):]
+        return None
+    seen: list[str] = []
+    todo = list(starts)
+    while todo:
+        url = todo.pop(0)
+        if url in seen:
+            continue
+        f = file_of(url)
+        if f is None or not f.is_file():
+            continue
+        seen.append(url)
+        for spec in IMPORTS.findall(f.read_text(encoding="utf-8")):
+            if spec.startswith("/assets/v/") or "://" in spec:
+                continue
+            nxt = posixpath.normpath(posixpath.join(posixpath.dirname(url), spec)) if spec.startswith(".") else spec
+            if nxt.startswith("/assets/") and nxt not in seen:
+                todo.append(nxt)
+    return seen

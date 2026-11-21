@@ -62,7 +62,7 @@ function moduleBanner(names) {
 
 async function boot() {
   theme.apply();
-  state.product = await (await fetch("/product.json")).json();
+  state.product = window.GREPX_PRODUCT || await (await fetch("/product.json")).json();   // the page carries it (one round trip less)
   brand(state.product);
   setupInstall(state.product.name);                   // installable on phones (every feature), offline page
   document.querySelector('meta[name="theme-color"]')?.setAttribute("content", state.product.theme?.primary || "#4f46e5");
