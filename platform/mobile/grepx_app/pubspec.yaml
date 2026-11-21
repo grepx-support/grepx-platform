@@ -1,0 +1,31 @@
+# Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+# This file is part of the GrepX platform and is proprietary and confidential.
+# Unauthorised copying, use, modification or distribution is strictly prohibited.
+
+# The shared phone app of every GrepX product (iOS + Android): the look, the shell, sign-in, the API client,
+# notifications, charts and the shared screens. A product's app (apps/mobile in its own repo) depends on this
+# package by path (platform/mobile/grepx_app, linked in by ./workspace.sh) and adds only its own screens.
+name: grepx_app
+description: Shared GrepX phone app - design system, shell, API, notifications and shared screens.
+publish_to: none
+version: 2.0.0
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+  flutter: ">=3.22.0"
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^1.2.1
+  shared_preferences: ^2.2.3
+  qr_flutter: ^4.1.0
+  mobile_scanner: ^5.1.1
+  url_launcher: ^6.3.0
+  webview_flutter: ^4.10.0
+  # open source (MIT / BSD): touchable charts, entrance animations, notifications on the phone
+  fl_chart: ">=0.69.0 <1.0.0"
+  flutter_animate: ^4.5.0
+  flutter_local_notifications: ^18.0.1
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
