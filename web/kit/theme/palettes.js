@@ -14,6 +14,7 @@ export const PALETTES = [
   { id: "route", label: "Route", about: "Tracking blue, delivery orange" },
   { id: "bistro", label: "Bistro", about: "Appetising red, warm gold" },
   { id: "mint", label: "Mint", about: "Shop green, urgency orange" },
+  { id: "care", label: "Care", about: "Calm medical teal, health green" },
   { id: "graphite", label: "Graphite", about: "Minimal black and white" },
 ];
 

@@ -6,7 +6,7 @@
 
 /* Colour palettes, each in a light and a dark mode: <html data-palette="ocean" data-theme="dark">. Only colours change;
    spacing, type and shape stay the kit's. Any element can carry the attributes (the theme menu's swatches do).
-   Picked with the ui-ux-pro-max design data (dashboard / fintech / logistics / restaurant / e-commerce profiles); every pair checked for
+   Picked with the ui-ux-pro-max design data (dashboard / fintech / logistics / restaurant / e-commerce / healthcare profiles); every pair checked for
    4.5:1 text contrast (ink on bg, muted on card, button text on primary). A new palette = one block here + one
    entry in theme/palettes.js. */
 
@@ -106,6 +106,20 @@
   --bg: #04130f; --bg-2: #071a15; --card: #0a1d17; --card-2: #10261f;
   --ink: #ecfdf5; --ink-2: #c6eadb; --muted: #93b5a8; --line: #173a2f;
   --good: #34d399; --bad: #fb7185; --warn: #fb923c; --info: #60a5fa;
+}
+
+/* Care - calm medical teal with health green (clinics, blood banks) */
+[data-palette="care"]:not([data-theme="dark"]) {
+  color-scheme: light; --primary: #0e7490; --primary-ink: #fff; --accent: #15803d;
+  --bg: #f0fdfa; --bg-2: #e0f7f4; --card: #fff; --card-2: #f5fdfc;
+  --ink: #0b2a2e; --ink-2: #134e4a; --muted: #475569; --line: #ccfbf1;
+  --good: #15803d; --bad: #be123c; --warn: #b45309; --info: #0369a1;
+}
+[data-palette="care"][data-theme="dark"] {
+  color-scheme: dark; --primary: #22d3ee; --primary-ink: #042f2e; --accent: #4ade80;
+  --bg: #04161a; --bg-2: #071d22; --card: #0a2227; --card-2: #0f2c32;
+  --ink: #ecfeff; --ink-2: #c5ecef; --muted: #94b8bd; --line: #164047;
+  --good: #4ade80; --bad: #fb7185; --warn: #fbbf24; --info: #7dd3fc;
 }
 
 /* the theme menu (theme/theme-menu.js) */
