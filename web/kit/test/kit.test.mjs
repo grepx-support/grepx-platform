@@ -121,7 +121,7 @@ test("theme: palettes the product offers, brand colours only while brand is chos
   const { Theme } = await import("../theme/theme.js");
   const { offered } = await import("../theme/palettes.js");
   assert.deepEqual(offered(["route", "nope", "brand", "ocean"]).map((p) => p.id), ["brand", "route", "ocean"]);
-  assert.equal(offered().length, 6);
+  assert.equal(offered().length, 8);
   const props = new Map(), root = { dataset: {}, style: { setProperty: (k, v) => props.set(k, v), removeProperty: (k) => props.delete(k) } };
   const store = new MemoryStore(), theme = new Theme(store, { matches: true }, root);
   theme.configure({ palettes: ["ocean", "terminal"], vars: { primary: "#0e7490" } }).apply();

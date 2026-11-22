@@ -6,7 +6,7 @@
 
 /* Colour palettes, each in a light and a dark mode: <html data-palette="ocean" data-theme="dark">. Only colours change;
    spacing, type and shape stay the kit's. Any element can carry the attributes (the theme menu's swatches do).
-   Picked with the ui-ux-pro-max design data (dashboard / fintech / logistics profiles); every pair checked for
+   Picked with the ui-ux-pro-max design data (dashboard / fintech / logistics / restaurant / e-commerce profiles); every pair checked for
    4.5:1 text contrast (ink on bg, muted on card, button text on primary). A new palette = one block here + one
    entry in theme/palettes.js. */
 
@@ -78,6 +78,34 @@
   --bg: #0b1120; --bg-2: #111a2e; --card: #131d33; --card-2: #19253f;
   --ink: #eef2ff; --ink-2: #c7d2fe; --muted: #94a3b8; --line: #23324f;
   --good: #34d399; --bad: #fb7185; --warn: #fb923c; --info: #93c5fd;
+}
+
+/* Bistro - appetising red with warm gold (restaurants, kitchens) */
+[data-palette="bistro"]:not([data-theme="dark"]) {
+  color-scheme: light; --primary: #b91c1c; --primary-ink: #fff; --accent: #a16207;
+  --bg: #fef7f5; --bg-2: #fbebe7; --card: #fff; --card-2: #fffaf8;
+  --ink: #2a0a0a; --ink-2: #4a1d1a; --muted: #6b4e4a; --line: #fad4cf;
+  --good: #047857; --bad: #b91c1c; --warn: #a16207; --info: #1d4ed8;
+}
+[data-palette="bistro"][data-theme="dark"] {
+  color-scheme: dark; --primary: #f87171; --primary-ink: #1a0505; --accent: #facc15;
+  --bg: #140b0a; --bg-2: #1a0f0d; --card: #1f1210; --card-2: #281714;
+  --ink: #fbefec; --ink-2: #e7cfc9; --muted: #b8a19c; --line: #3a2420;
+  --good: #34d399; --bad: #fb7185; --warn: #fbbf24; --info: #60a5fa;
+}
+
+/* Mint - shop green with urgency orange (retail, e-commerce) */
+[data-palette="mint"]:not([data-theme="dark"]) {
+  color-scheme: light; --primary: #047857; --primary-ink: #fff; --accent: #ea580c;
+  --bg: #f2fbf7; --bg-2: #e3f6ee; --card: #fff; --card-2: #f6fdf9;
+  --ink: #06281f; --ink-2: #064e3b; --muted: #4b635a; --line: #bfebd8;
+  --good: #047857; --bad: #be123c; --warn: #c2410c; --info: #1d4ed8;
+}
+[data-palette="mint"][data-theme="dark"] {
+  color-scheme: dark; --primary: #34d399; --primary-ink: #022c22; --accent: #fb923c;
+  --bg: #04130f; --bg-2: #071a15; --card: #0a1d17; --card-2: #10261f;
+  --ink: #ecfdf5; --ink-2: #c6eadb; --muted: #93b5a8; --line: #173a2f;
+  --good: #34d399; --bad: #fb7185; --warn: #fb923c; --info: #60a5fa;
 }
 
 /* the theme menu (theme/theme-menu.js) */
