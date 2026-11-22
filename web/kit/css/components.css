@@ -45,8 +45,8 @@
 .kit-chip.on { background: var(--area, var(--primary)); color: #fff; border-color: transparent; }
 .kit-pill { display: inline-flex; align-items: center; gap: 5px; padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 700;
   background: color-mix(in srgb, var(--muted) 15%, transparent); color: var(--ink-2); }
-.kit-pill.good { background: color-mix(in srgb, var(--good) 15%, transparent); color: var(--good); }
-.kit-pill.bad { background: color-mix(in srgb, var(--bad) 15%, transparent); color: var(--bad); }
+.kit-pill.good, .kit-pill.ok { background: color-mix(in srgb, var(--good) 15%, transparent); color: var(--good); }
+.kit-pill.bad, .kit-pill.danger { background: color-mix(in srgb, var(--bad) 15%, transparent); color: var(--bad); }
 .kit-pill.warn { background: color-mix(in srgb, var(--warn) 18%, transparent); color: var(--warn); }
 .kit-pill.info { background: color-mix(in srgb, var(--info) 15%, transparent); color: var(--info); }
 
