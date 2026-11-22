@@ -6,7 +6,7 @@
 
 /* Colour palettes, each in a light and a dark mode: <html data-palette="ocean" data-theme="dark">. Only colours change;
    spacing, type and shape stay the kit's. Any element can carry the attributes (the theme menu's swatches do).
-   Picked with the ui-ux-pro-max design data (dashboard / fintech / logistics / restaurant / e-commerce / healthcare profiles); every pair checked for
+   Picked with the ui-ux-pro-max design data (dashboard / fintech / logistics / restaurant / e-commerce / healthcare / web3 profiles); every pair checked for
    4.5:1 text contrast (ink on bg, muted on card, button text on primary). A new palette = one block here + one
    entry in theme/palettes.js. */
 
@@ -120,6 +120,20 @@
   --bg: #04161a; --bg-2: #071d22; --card: #0a2227; --card-2: #0f2c32;
   --ink: #ecfeff; --ink-2: #c5ecef; --muted: #94b8bd; --line: #164047;
   --good: #4ade80; --bad: #fb7185; --warn: #fbbf24; --info: #7dd3fc;
+}
+
+/* Nebula - Web3 violet with gold for value (crypto, market data, token platforms) */
+[data-palette="nebula"]:not([data-theme="dark"]) {
+  color-scheme: light; --primary: #5b21b6; --primary-ink: #fff; --accent: #a16207;
+  --bg: #faf7ff; --bg-2: #f1ebfd; --card: #fff; --card-2: #fbf9ff;
+  --ink: #1a1033; --ink-2: #4c1d95; --muted: #5b5675; --line: #e4dcfb;
+  --good: #047857; --bad: #be123c; --warn: #a16207; --info: #1d4ed8;
+}
+[data-palette="nebula"][data-theme="dark"] {
+  color-scheme: dark; --primary: #a78bfa; --primary-ink: #0f0f23; --accent: #fbbf24;
+  --bg: #0f0f23; --bg-2: #15152d; --card: #1e1d35; --card-2: #262444;
+  --ink: #f8fafc; --ink-2: #d6d3f5; --muted: #a5a3c9; --line: #36315e;
+  --good: #34d399; --bad: #fb7185; --warn: #fbbf24; --info: #93c5fd;
 }
 
 /* the theme menu (theme/theme-menu.js) */
