@@ -7,7 +7,7 @@
 // Shared web shell for every GrepX product. A product = product.json (brand, colours, areas, modules); modules live in
 // modules/core (all products) and the product's own folder. This file only wires the parts together and starts the app;
 // each part is its own file under shell/ (state, api, session, nav, router, toast) and the UI kit is under kit/.
-import { enableTilt, esc, LocalStore, Theme, ThemeToggle } from "./kit/index.js";
+import { enableTilt, esc, LocalStore, Theme, ThemeMenu } from "./kit/index.js";
 import { api, onUnauthorized, run } from "./shell/api.js";
 import { renderNav } from "./shell/nav.js";
 import { route } from "./shell/router.js";
@@ -30,7 +30,8 @@ export const theme = new Theme(store);
 
 function brand(p) {
   document.title = p.name;
-  for (const [k, v] of Object.entries(p.theme || {})) document.documentElement.style.setProperty(`--${k}`, v);
+  theme.configure({ palettes: p.palettes, palette: p.palette, vars: p.theme });   // its colours = the "brand" palette
+  theme.apply();
   for (const href of p.styles || []) {                    // a product's own stylesheet(s), e.g. "kitchen/kitchen.css"
     const link = document.createElement("link");
     Object.assign(link, { rel: "stylesheet", href: new URL(`./modules/${href}`, import.meta.url).href });   // same build as this file
@@ -39,8 +40,15 @@ function brand(p) {
   document.querySelector("#brand").innerHTML = `<span class="logo">${esc(p.logo || "")}</span><span>${esc(p.name)}<small>${esc(p.tagline || "")}</small></span>`;
 }
 
+/** The phone's browser bar takes the palette's main colour. */
+function themeColour() {
+  const c = getComputedStyle(document.documentElement).getPropertyValue("--primary").trim();
+  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", c || state.product?.theme?.primary || "#4f46e5");
+}
+
 function frame() {
-  new ThemeToggle({ theme }).mount(document.querySelector("#theme"));
+  new ThemeMenu({ theme }).mount(document.querySelector("#theme"));
+  theme.on("change", themeColour);
   enableTilt(".kit-tilt, .kit-kpi");
   const open = () => document.body.classList.toggle("nav-open");
   document.querySelector("#menu").onclick = open;
@@ -65,7 +73,7 @@ async function boot() {
   state.product = window.GREPX_PRODUCT || await (await fetch("/product.json")).json();   // the page carries it (one round trip less)
   brand(state.product);
   setupInstall(state.product.name);                   // installable on phones (every feature), offline page
-  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", state.product.theme?.primary || "#4f46e5");
+  themeColour();
   frame();
   // All modules download at once (not one after another); routes keep product.json's order. One module that fails to
   // load (an old or missing file on the server) never blanks the app: the rest works and a banner names what failed.

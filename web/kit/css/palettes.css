@@ -1,0 +1,99 @@
+/*
+ * Copyright (c) 2026 GrepX Private Limited (grepx.sg). All rights reserved.
+ * This file is part of the GrepX platform and is proprietary and confidential.
+ * Unauthorised copying, use, modification or distribution is strictly prohibited.
+ */
+
+/* Colour palettes, each in a light and a dark mode: <html data-palette="ocean" data-theme="dark">. Only colours change;
+   spacing, type and shape stay the kit's. Any element can carry the attributes (the theme menu's swatches do).
+   Picked with the ui-ux-pro-max design data (dashboard / fintech / logistics profiles); every pair checked for
+   4.5:1 text contrast (ink on bg, muted on card, button text on primary). A new palette = one block here + one
+   entry in theme/palettes.js. */
+
+/* Ocean - analytics blue with amber highlights */
+[data-palette="ocean"]:not([data-theme="dark"]) {
+  color-scheme: light; --primary: #1e40af; --primary-ink: #fff; --accent: #d97706;
+  --bg: #f8fafc; --bg-2: #eef3fb; --card: #fff; --card-2: #f5f8fe;
+  --ink: #0f1e3d; --ink-2: #1e3a8a; --muted: #475569; --line: #dbeafe;
+  --good: #047857; --bad: #be123c; --warn: #b45309; --info: #1d4ed8;
+}
+[data-palette="ocean"][data-theme="dark"] {
+  color-scheme: dark; --primary: #60a5fa; --primary-ink: #0b1220; --accent: #f59e0b;
+  --bg: #07111f; --bg-2: #0c1a2e; --card: #0f1f36; --card-2: #142742;
+  --ink: #e6eefa; --ink-2: #bfd3f2; --muted: #8aa0c2; --line: #1e3354;
+  --good: #34d399; --bad: #fb7185; --warn: #fbbf24; --info: #93c5fd;
+}
+
+/* Terminal - trading-desk dark with green for up */
+[data-palette="terminal"]:not([data-theme="dark"]) {
+  color-scheme: light; --primary: #15803d; --primary-ink: #fff; --accent: #15803d;
+  --bg: #f6f8f7; --bg-2: #ecf1ee; --card: #fff; --card-2: #f7faf8;
+  --ink: #0b1410; --ink-2: #27352d; --muted: #5b6b62; --line: #dce5df;
+  --good: #15803d; --bad: #be123c; --warn: #b45309; --info: #1d4ed8;
+}
+[data-palette="terminal"][data-theme="dark"] {
+  color-scheme: dark; --primary: #22c55e; --primary-ink: #052e16; --accent: #22c55e;
+  --bg: #020617; --bg-2: #070c1c; --card: #0e1223; --card-2: #141a2e;
+  --ink: #f8fafc; --ink-2: #cbd5e1; --muted: #94a3b8; --line: #1e293b;
+  --good: #22c55e; --bad: #f43f5e; --warn: #facc15; --info: #38bdf8;
+}
+
+/* Gold - fintech gold on deep navy */
+[data-palette="gold"]:not([data-theme="dark"]) {
+  color-scheme: light; --primary: #b45309; --primary-ink: #fff; --accent: #b45309;
+  --bg: #faf8f3; --bg-2: #f3eee2; --card: #fff; --card-2: #fffbf2;
+  --ink: #1c1917; --ink-2: #44403c; --muted: #78716c; --line: #eae3d2;
+  --good: #047857; --bad: #be123c; --warn: #b45309; --info: #1d4ed8;
+}
+[data-palette="gold"][data-theme="dark"] {
+  color-scheme: dark; --primary: #f59e0b; --primary-ink: #0f172a; --accent: #fbbf24;
+  --bg: #0f172a; --bg-2: #151c30; --card: #1b2132; --card-2: #222735;
+  --ink: #f8fafc; --ink-2: #cbd5e1; --muted: #94a3b8; --line: #334155;
+  --good: #34d399; --bad: #fb7185; --warn: #fbbf24; --info: #60a5fa;
+}
+
+/* Graphite - Swiss minimal, black and white */
+[data-palette="graphite"]:not([data-theme="dark"]) {
+  color-scheme: light; --primary: #18181b; --primary-ink: #fff; --accent: #18181b;
+  --bg: #f7f7f8; --bg-2: #efeff1; --card: #fff; --card-2: #fafafa;
+  --ink: #0a0a0a; --ink-2: #3f3f46; --muted: #71717a; --line: #e4e4e7;
+  --good: #047857; --bad: #be123c; --warn: #b45309; --info: #1d4ed8;
+}
+[data-palette="graphite"][data-theme="dark"] {
+  color-scheme: dark; --primary: #f4f4f5; --primary-ink: #09090b; --accent: #f4f4f5;
+  --bg: #09090b; --bg-2: #111113; --card: #161618; --card-2: #1d1d20;
+  --ink: #fafafa; --ink-2: #d4d4d8; --muted: #a1a1aa; --line: #27272a;
+  --good: #34d399; --bad: #fb7185; --warn: #fbbf24; --info: #60a5fa;
+}
+
+/* Route - logistics tracking blue with delivery orange */
+[data-palette="route"]:not([data-theme="dark"]) {
+  color-scheme: light; --primary: #2563eb; --primary-ink: #fff; --accent: #ea580c;
+  --bg: #f3f7ff; --bg-2: #e6eefc; --card: #fff; --card-2: #f7faff;
+  --ink: #0f172a; --ink-2: #1e3a8a; --muted: #475569; --line: #bfdbfe;
+  --good: #047857; --bad: #be123c; --warn: #c2410c; --info: #1d4ed8;
+}
+[data-palette="route"][data-theme="dark"] {
+  color-scheme: dark; --primary: #60a5fa; --primary-ink: #0b1220; --accent: #fb923c;
+  --bg: #0b1120; --bg-2: #111a2e; --card: #131d33; --card-2: #19253f;
+  --ink: #eef2ff; --ink-2: #c7d2fe; --muted: #94a3b8; --line: #23324f;
+  --good: #34d399; --bad: #fb7185; --warn: #fb923c; --info: #93c5fd;
+}
+
+/* the theme menu (theme/theme-menu.js) */
+.kit-theme-menu { position: fixed; z-index: 90; width: min(320px, calc(100vw - 16px)); padding: 12px; display: grid; gap: 12px;
+  background: var(--card); color: var(--ink); border: 1px solid var(--line); border-radius: var(--radius-sm); box-shadow: var(--shadow-lg); }
+.kit-theme-menu h4 { margin: 0; font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+.kit-theme-modes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 3px; background: var(--bg-2); border-radius: 10px; }
+.kit-theme-modes button { min-height: 34px; border: 0; border-radius: 8px; background: transparent; color: var(--ink-2); cursor: pointer;
+  display: inline-flex; gap: 6px; align-items: center; justify-content: center; font: inherit; font-size: 13px; transition: background .15s; }
+.kit-theme-modes button[aria-pressed="true"] { background: var(--card); color: var(--ink); box-shadow: var(--shadow); }
+.kit-theme-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+.kit-theme-pick { display: grid; gap: 6px; padding: 8px; min-height: 44px; text-align: left; cursor: pointer; font: inherit; font-size: 13px;
+  border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--ink); transition: border-color .15s, transform .12s; }
+.kit-theme-pick:hover { transform: translateY(-1px); }
+.kit-theme-pick[aria-pressed="true"] { border-color: var(--primary); box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 35%, transparent); }
+.kit-theme-pick .sw { display: flex; gap: 4px; }
+.kit-theme-pick .sw i { width: 18px; height: 18px; border-radius: 50%; border: 1px solid var(--line); }
+.kit-theme-pick:focus-visible, .kit-theme-modes button:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .kit-theme-pick, .kit-theme-modes button { transition: none; } .kit-theme-pick:hover { transform: none; } }

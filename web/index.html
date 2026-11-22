@@ -14,8 +14,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'">
   <link rel="stylesheet" href="/assets/ui.css">
-  <script>try { var t = JSON.parse(localStorage.getItem("grepx." + location.host + ".theme") || '"system"');
-    document.documentElement.dataset.theme = t === "system" ? (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light") : t; } catch (e) {}</script>
+  <script>try { var k = "grepx." + location.host + ".", t = JSON.parse(localStorage.getItem(k + "theme") || '"system"'), p = JSON.parse(localStorage.getItem(k + "palette") || '""');
+    document.documentElement.dataset.theme = t === "system" ? (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light") : t;
+    if (p) document.documentElement.dataset.palette = p; } catch (e) {}</script>
 </head>
 <body>
   <div class="shell">

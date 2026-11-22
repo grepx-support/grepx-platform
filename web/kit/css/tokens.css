@@ -4,8 +4,10 @@
  * Unauthorised copying, use, modification or distribution is strictly prohibited.
  */
 
-/* Design tokens: one set of names, two themes. Products override --primary (product.json theme) and area colours. */
-:root, :root[data-theme="light"] {
+/* Design tokens: one set of names, two modes. This is the "brand" palette - products override --primary (product.json
+   theme) and area colours; other palettes (palettes.css) replace the colours. Also matched on any element with
+   data-palette="brand", so the theme menu can show its swatch. */
+:root, [data-palette="brand"]:not([data-theme="dark"]) {
   color-scheme: light;
   --primary: #6d28d9; --primary-ink: #fff;
   --accent: var(--primary);
@@ -19,7 +21,7 @@
   --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --side: 248px;
 }
-:root[data-theme="dark"] {
+:root[data-theme="dark"], [data-palette="brand"][data-theme="dark"] {
   color-scheme: dark;
   --bg: #080c18; --bg-2: #0e1426; --card: #111a2e; --card-2: #16213a;
   --ink: #e8ecf6; --ink-2: #c3cbe0; --muted: #8b97b5; --line: #222e4a;

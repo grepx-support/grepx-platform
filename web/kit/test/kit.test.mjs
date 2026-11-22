@@ -116,3 +116,22 @@ test("code 128 barcodes: IMEIs in set C with a set-B last digit, text in set B, 
   assert.throws(() => code128Values(""));
   assert.throws(() => code128Values("café"));
 });
+
+test("theme: palettes the product offers, brand colours only while brand is chosen, mode kept apart", async () => {
+  const { Theme } = await import("../theme/theme.js");
+  const { offered } = await import("../theme/palettes.js");
+  assert.deepEqual(offered(["route", "nope", "brand", "ocean"]).map((p) => p.id), ["brand", "route", "ocean"]);
+  assert.equal(offered().length, 6);
+  const props = new Map(), root = { dataset: {}, style: { setProperty: (k, v) => props.set(k, v), removeProperty: (k) => props.delete(k) } };
+  const store = new MemoryStore(), theme = new Theme(store, { matches: true }, root);
+  theme.configure({ palettes: ["ocean", "terminal"], vars: { primary: "#0e7490" } }).apply();
+  assert.equal(root.dataset.palette, "brand"); assert.equal(root.dataset.theme, "dark"); assert.equal(props.get("--primary"), "#0e7490");
+  theme.setPalette("ocean");
+  assert.equal(root.dataset.palette, "ocean"); assert.equal(props.has("--primary"), false);
+  theme.setPalette("gold");                                              // not offered by this product: ignored
+  assert.equal(theme.palette(), "ocean");
+  theme.set("light");
+  assert.deepEqual([root.dataset.theme, root.dataset.palette], ["light", "ocean"]);
+  theme.configure({ palettes: ["route"], palette: "route" });          // a product without ocean falls back to its default
+  assert.equal(theme.palette(), "route");
+});

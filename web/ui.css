@@ -4,9 +4,10 @@
  * Unauthorised copying, use, modification or distribution is strictly prohibited.
  */
 
-/* One stylesheet for every product: the kit's tokens (light/dark), base elements, app shell, components, drag and drop.
+/* One stylesheet for every product: the kit's tokens (light/dark) and colour palettes, base elements, app shell, components, drag and drop.
    Colours a product sets in product.json (theme, areas) override the tokens as CSS variables. */
 @import url("kit/css/tokens.css");
+@import url("kit/css/palettes.css");
 @import url("kit/css/base.css");
 @import url("kit/css/shell.css");
 @import url("kit/css/components.css");
