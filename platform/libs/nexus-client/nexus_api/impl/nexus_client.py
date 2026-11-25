@@ -30,6 +30,7 @@ from .tcp_connection import TcpConnection
 
 logger = logging.getLogger(__name__)
 AUTH_ATTEMPTS = 14
+RECONNECT_MAX = 60.0         # longest wait between two tries to bring a dropped subscription back
 
 ConnectionFactory = Callable[[str, int], ConnectionInterface]
 
@@ -245,6 +246,7 @@ class NexusClient(ClientInterface):
                 conn.close()
             except Exception:
                 pass
+            failures = 0
             while not stop.is_set():
                 try:
                     fresh = self._connection_factory(self.host, self.port)
@@ -265,13 +267,15 @@ class NexusClient(ClientInterface):
                         on_event(Row(row.key, dict(row.fields)))
                     return
                 except Exception as exc:
-                    logger.warning("subscription reconnect failed (%s): subscription_id=%s; retrying",
-                                   exc, sub_id)
+                    # 2, 4, 8 ... 60 s between tries: a login refused for good (a wrong secret) must not flood Nexus and the disk
+                    failures += 1
+                    wait = min(RECONNECT_MAX, 2.0 * 2 ** (failures - 1))
+                    logger.warning("subscription reconnect failed (%s): subscription_id=%s; retrying in %.0f s", exc, sub_id, wait)
                     try:
                         fresh.close()
                     except Exception:
                         pass
-                    time.sleep(2.0)
+                    stop.wait(wait)
 
         def _loop():
             while not stop.is_set():

@@ -26,11 +26,12 @@ def command_for(name: str, path: Path) -> tuple[list[str], Path]:
 def pid_of(name: str) -> int | None:
     f = RUN / f"{name}.pid"
     if f.exists():
-        pid = int(f.read_text())
+        text = f.read_text().strip()
         try:
+            pid = int(text)
             os.kill(pid, 0)
             return pid
-        except OSError:
+        except (ValueError, OSError):      # gone, or a pid file left empty (a full disk) - forget it and go on
             f.unlink(missing_ok=True)
     if name == "nexus-server":          # started some other way: find whoever listens on the Nexus port
         pid = port_owner(nexus_port())
@@ -96,6 +97,7 @@ def start(arg: str) -> None:
             say("ERROR", name, f"{Path(command[0]).relative_to(ROOT)} missing - copy the C++ nexus_server binary there")
             continue
         rotate(LOGS / f"{name}.log")
+        rotate(LOGS / f"{name}.console.log")          # nexus' console copy grew to many GB when only its log was rotated
         extra = {"GREPX_PROJECT": registry()[name]["project"]}
         if name == "nexus-server":   # the C++ server writes its own log file; console copy goes to .console.log
             extra["NEXUS_LOG_PATH"] = str(LOGS / f"{name}.log")
