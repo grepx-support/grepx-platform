@@ -22,11 +22,15 @@ export class Theme extends Emitter {
     this.vars = {};
     this.list = offered();
     this.fallback = "brand";
+    this.mode = "system";                        // the product's default mode until the viewer picks one
     this.media?.addEventListener?.("change", () => this.choice() === "system" && this.apply());
   }
 
-  /** The product's palettes (product.json "palettes") and its own colours (product.json "theme"). */
-  configure({ palettes, palette, vars } = {}) {
+  /** The product's palettes (product.json "palettes"), its own colours ("theme") and its default mode ("mode": a
+   * dark-first product says "dark"). The default is remembered so the page's first paint (index.html) uses it too. */
+  configure({ palettes, palette, vars, mode } = {}) {
+    this.mode = MODES.includes(mode) ? mode : "system";
+    this.store.set("theme_default", this.mode);
     this.list = offered(palettes);
     this.fallback = this.offers(palette) ? palette : "brand";
     this.vars = vars || {};
@@ -36,7 +40,7 @@ export class Theme extends Emitter {
   offers(id) { return this.list.some((p) => p.id === id); }
 
   /** "light", "dark" or "system" (follow the device). */
-  choice() { return this.store.get("theme", "system"); }
+  choice() { return this.store.get("theme", this.mode); }
 
   current() {
     const c = this.choice();

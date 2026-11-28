@@ -30,7 +30,7 @@ export const theme = new Theme(store);
 
 function brand(p) {
   document.title = p.name;
-  theme.configure({ palettes: p.palettes, palette: p.palette, vars: p.theme });   // its colours = the "brand" palette
+  theme.configure({ palettes: p.palettes, palette: p.palette, vars: p.theme, mode: p.mode });   // its colours = the "brand" palette
   theme.apply();
   for (const href of p.styles || []) {                    // a product's own stylesheet(s), e.g. "kitchen/kitchen.css"
     const link = document.createElement("link");

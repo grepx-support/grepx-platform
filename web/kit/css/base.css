@@ -9,7 +9,7 @@
 [hidden] { display: none !important; }
 html { -webkit-text-size-adjust: 100%; }
 body { margin: 0; font: 15px/1.55 var(--font); background: var(--bg); color: var(--ink); transition: background .25s, color .25s; }
-a { color: var(--primary); text-decoration: none; }
+a { color: var(--link); text-decoration: none; }
 h1 { font-size: 1.75rem; line-height: 1.2; margin: .1em 0 .3em; letter-spacing: -.02em; }
 h2 { font-size: 1.12rem; margin: 0 0 .7em; letter-spacing: -.01em; }
 h3 { font-size: 1rem; margin: 0; }
@@ -38,7 +38,7 @@ h3 { font-size: 1rem; margin: 0; }
 .btn.danger { background: var(--bad); color: #fff; border-color: transparent; }
 .btn.small { padding: 5px 10px; font-size: 13px; border-radius: 10px; }
 .btn:disabled { opacity: .5; pointer-events: none; }
-:focus-visible { outline: none; box-shadow: var(--glow); }
+:focus-visible { outline: none; box-shadow: var(--focus-ring); }
 
 input, select, textarea { font: inherit; padding: 9px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--card-2); color: var(--ink); width: 100%;
   transition: border-color .15s, box-shadow .15s; }
@@ -58,7 +58,7 @@ tbody tr:hover td { background: color-mix(in srgb, var(--primary) 4%, transparen
 .stat { font-size: 2rem; font-weight: 800; letter-spacing: -.02em; }
 .item { border: 1px solid var(--line); border-radius: 12px; padding: 9px 12px; margin: 6px 0; background: var(--card-2); }
 pre { white-space: pre-wrap; font-size: 13px; background: var(--card-2); border: 1px solid var(--line); border-radius: 12px; padding: 12px; }
-details summary { cursor: pointer; font-weight: 600; color: var(--primary); margin: 10px 0; }
+details summary { cursor: pointer; font-weight: 600; color: var(--link); margin: 10px 0; }
 
 #toast { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); display: grid; gap: 8px; z-index: 60; }
 #toast div { background: var(--ink); color: var(--bg); padding: 11px 16px; border-radius: 12px; max-width: 92vw; box-shadow: var(--shadow-lg); animation: kit-pop .25s ease-out; }

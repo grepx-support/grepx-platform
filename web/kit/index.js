@@ -13,6 +13,7 @@ export { LocalStore, MemoryStore } from "./core/local-store.js";
 export { hasIcon, icon, registerIcons } from "./icons/icons.js";
 export { MODES, Theme } from "./theme/theme.js";
 export { offered, PALETTES } from "./theme/palettes.js";
+export { blocks, luminance, PAIRS, ratio, resolve, rgb, shortfalls } from "./theme/contrast.js";
 export { ThemeMenu } from "./theme/theme-menu.js";
 export { ThemeToggle } from "./theme/theme-toggle.js";
 export { before, DragController } from "./dnd/drag-controller.js";
