@@ -213,3 +213,11 @@ a.kit-hit > rect[rx] { transition: opacity .15s; } a.kit-hit:hover > rect[rx] { 
 .bell-panel li button:hover { background: var(--bg); } .bell-panel li.new button { background: color-mix(in srgb, #2563eb 8%, transparent); }
 .bell-panel li span { font-size: .82rem; color: var(--muted); overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 .bell-panel li small { font-size: .72rem; color: var(--muted); } .bell-panel > p { padding: 10px; margin: 0; }
+
+/* The six state words (healthy, degraded, failed, unavailable, unknown, stale) - @grepx/web-react StateBadge */
+.kit-state { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 600;
+  border: 1px solid var(--line); background: var(--bg-2); color: var(--ink-2); white-space: nowrap; }
+.kit-state.good { color: var(--good); background: var(--good-bg); border-color: color-mix(in srgb, var(--good) 40%, var(--line)); }
+.kit-state.warn { color: var(--warn); background: var(--warn-bg); border-color: color-mix(in srgb, var(--warn) 45%, var(--line)); }
+.kit-state.bad { color: var(--bad); background: var(--bad-bg); border-color: color-mix(in srgb, var(--bad) 50%, var(--line)); }
+.kit-state.muted { color: var(--muted); }
