@@ -10,6 +10,7 @@
 import { enableTilt, esc, LocalStore, Theme, ThemeMenu } from "./kit/index.js";
 import { api, onUnauthorized, run } from "./shell/api.js";
 import { renderEnv } from "./shell/env.js";
+import { setupMini } from "./shell/mini.js";
 import { renderNav } from "./shell/nav.js";
 import { route } from "./shell/router.js";
 import { can, loadMe, login, logout, onSessionChange } from "./shell/session.js";
@@ -54,6 +55,7 @@ function frame() {
   enableTilt(".kit-tilt, .kit-kpi");
   const open = () => document.body.classList.toggle("nav-open");
   document.querySelector("#menu").onclick = open;
+  setupMini(store);                                         // the menu as icons only: more room for the page, remembered
   document.querySelector(".scrim").onclick = open;
 }
 

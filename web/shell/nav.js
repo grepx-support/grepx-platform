@@ -23,7 +23,7 @@ export function currentRoute() {
     .sort((a, b) => b.path.length - a.path.length)[0];
 }
 
-const link = (r, active, n = 0) => html`<a href="#${r.path}" class="${r === active ? "on" : ""}" style="${areaOf(r) ? `--area:${areaOf(r)}` : ""}"
+const link = (r, active, n = 0) => html`<a href="#${r.path}" title="${r.nav}" class="${r === active ? "on" : ""}" style="${areaOf(r) ? `--area:${areaOf(r)}` : ""}"
   ${r === active ? 'aria-current="page"' : ""}><span class="ni">${icon(r.icon || "dot")}</span>${r.nav}${n ? html`<kbd>Alt ${n}</kbd>` : ""}</a>`;
 
 function links() {
