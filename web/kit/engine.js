@@ -24,9 +24,9 @@ export function makeEngine(product, flags) {
   const engine = (path) => { const mine = override(); return mine[path] || mine["*"] || flags[path] || "legacy"; };
 
   /** A route's render: the React one when its flag says so (its bundle loads on first use), else the legacy one. */
-  const choose = (path, legacy, loadReact) => async (el, q) => {
-    if (engine(path) === "react") return (await loadReact()).renders[path](el, q);
-    return legacy(el, q);
+  const choose = (path, legacy, loadReact) => async (el, ...args) => {
+    if (engine(path) === "react") return (await loadReact()).renders[path](el, ...args);
+    return legacy(el, ...args);
   };
   return { engine, choose, flags };
 }
