@@ -18,7 +18,7 @@ from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import HTMLResponse
-from fastapi.responses import FileResponse, PlainTextResponse
+from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 from grepx_service import new_key
 from starlette.concurrency import run_in_threadpool
@@ -96,7 +96,8 @@ def create_app(gw: Gateway, product_routers: Iterable[APIRouter], title: str, we
 
         @app.get("/product.json", include_in_schema=False)
         def product_config():
-            return FileResponse(product_dir / "product.json" if product_dir is not None else web_dir / "products" / f"{product}.json")
+            return JSONResponse(with_environment(json.loads((product_dir / "product.json" if product_dir is not None else web_dir / "products" / f"{product}.json").read_text(encoding="utf-8"))),
+                                headers={"Cache-Control": "no-cache"})
 
         @app.get("/{path:path}", include_in_schema=False)
         def spa(path: str):
@@ -105,6 +106,13 @@ def create_app(gw: Gateway, product_routers: Iterable[APIRouter], title: str, we
 
 
 VERSIONED = "/assets/v/"
+
+
+def with_environment(product: dict) -> dict:
+    """product.json plus this server's environment (GREPX_ENV: development, staging, production...) - the shell shows it
+    as a badge in the top bar on every page, so nobody mistakes production for a test server. Unset: no badge."""
+    env = os.environ.get("GREPX_ENV", "").strip()
+    return {**product, "environment": env} if env else product
 SLOW_MS = float(os.environ.get("GREPX_SLOW_MS", "1000"))        # API calls slower than this are logged (grepx.slow)
 slow_log = logging.getLogger("grepx.slow")
 log = logging.getLogger("grepx.web")
@@ -151,7 +159,7 @@ class WebBuild:
         if self._head[0] == v or not self.mounts or self.product_json is None:
             return self._head[1] if self._head[0] == v else ""
         try:
-            product = json.loads(self.product_json().read_text(encoding="utf-8"))
+            product = with_environment(json.loads(self.product_json().read_text(encoding="utf-8")))
             starts = ["/assets/app.js", *(f"/assets/modules/{m}.js" for m in product.get("modules") or [])]
             links = "".join(f'<link rel="modulepreload" href="{v}{url[len("/assets/"):]}">' for url in module_graph(starts, self.mounts))
             inline = "<script>window.GREPX_PRODUCT = %s;</script>" % json.dumps(product).replace("</", "<\\/")

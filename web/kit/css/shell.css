@@ -130,3 +130,11 @@ kbd { display: inline-block; padding: 1px 6px; border-radius: 6px; border: 1px s
 .top .crumb .pin:hover { color: #f59e0b; transform: scale(1.1); }
 .top .crumb .pin.on { color: #f59e0b; } .top .crumb .pin.on svg { fill: currentColor; }
 .kit-loadfail { background: color-mix(in srgb, var(--bad) 14%, var(--card)); color: var(--bad); font-weight: 600; }
+
+/* The server's environment (GREPX_ENV) in the top bar - words + icon; production stands out */
+.kit-env { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 999px; font-size: 12px; font-weight: 700;
+  letter-spacing: .02em; border: 1px solid var(--line); background: var(--bg-2); color: var(--ink-2); white-space: nowrap; }
+.kit-env.good { color: var(--good); border-color: color-mix(in srgb, var(--good) 40%, var(--line)); background: var(--good-bg); }
+.kit-env.warn { color: var(--warn); border-color: color-mix(in srgb, var(--warn) 45%, var(--line)); background: var(--warn-bg); }
+.kit-env.bad { color: var(--bad); border-color: color-mix(in srgb, var(--bad) 55%, var(--line)); background: var(--bad-bg); }
+.kit-env.info { color: var(--info); border-color: color-mix(in srgb, var(--info) 40%, var(--line)); background: var(--info-bg); }

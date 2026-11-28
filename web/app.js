@@ -9,6 +9,7 @@
 // each part is its own file under shell/ (state, api, session, nav, router, toast) and the UI kit is under kit/.
 import { enableTilt, esc, LocalStore, Theme, ThemeMenu } from "./kit/index.js";
 import { api, onUnauthorized, run } from "./shell/api.js";
+import { renderEnv } from "./shell/env.js";
 import { renderNav } from "./shell/nav.js";
 import { route } from "./shell/router.js";
 import { can, loadMe, login, logout, onSessionChange } from "./shell/session.js";
@@ -32,6 +33,7 @@ function brand(p) {
   document.title = p.name;
   theme.configure({ palettes: p.palettes, palette: p.palette, vars: p.theme, mode: p.mode });   // its colours = the "brand" palette
   theme.apply();
+  renderEnv(p.environment);                               // the server's environment (GREPX_ENV) as a badge in the top bar
   for (const href of p.styles || []) {                    // a product's own stylesheet(s), e.g. "kitchen/kitchen.css"
     const link = document.createElement("link");
     Object.assign(link, { rel: "stylesheet", href: new URL(`./modules/${href}`, import.meta.url).href });   // same build as this file
