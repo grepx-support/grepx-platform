@@ -1,0 +1,9 @@
+{
+  "name": "@grepx/web-react",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "GrepX's shared React layer for every product's screens: route mounting inside the shared shell, the kit's pieces as components, DataTable, load states, and the build, lint and bundle-check tools. Products depend on it by path; React comes from the product (one copy).",
+  "exports": { "./*": "./src/*", "./tools/*": "./tools/*" },
+  "peerDependencies": { "react": "19.3.1", "react-dom": "19.3.1" }
+}

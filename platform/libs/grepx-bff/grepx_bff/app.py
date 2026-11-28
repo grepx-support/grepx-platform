@@ -23,6 +23,7 @@ from fastapi.staticfiles import StaticFiles
 from grepx_service import new_key
 from starlette.concurrency import run_in_threadpool
 
+from .edge import cors_origins, harden
 from .gateway import CURRENT_TRACE, Gateway
 from .routers import COMMON_ROUTERS
 
@@ -32,7 +33,7 @@ def create_app(gw: Gateway, product_routers: Iterable[APIRouter], title: str, we
     """web_dir: the shared web shell (grepx-platform web/); product_dir: the product's modules/ and product.json."""
     app = FastAPI(title=title, version="1.0")
     app.state.gateway = gw
-    app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"], expose_headers=["X-Trace-Id"])
+    app.add_middleware(CORSMiddleware, allow_origins=cors_origins(), allow_methods=["*"], allow_headers=["*"], expose_headers=["X-Trace-Id"])
     app.add_middleware(GZipMiddleware, minimum_size=1024, compresslevel=6)     # modules, styles and big lists: about a quarter of the bytes
 
     product_json = (lambda: product_dir / "product.json") if product_dir is not None else (lambda: web_dir / "products" / f"{product}.json")
@@ -76,6 +77,8 @@ def create_app(gw: Gateway, product_routers: Iterable[APIRouter], title: str, we
     def metrics():
         from grepx_web_bootstrap import prometheus_text
         return PlainTextResponse(prometheus_text(gw.cfg.service_name))
+
+    harden(app, gw)                                    # every product: security headers, per-page CSP, failed sign-in limit (edge/)
 
     for router in [*COMMON_ROUTERS, *product_routers]:
         app.include_router(router, prefix="/api/v1")
