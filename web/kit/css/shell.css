@@ -142,8 +142,8 @@ kbd { display: inline-block; padding: 1px 6px; border-radius: 6px; border: 1px s
 /* The menu as icons only (shell/mini.js): the page gets the width; names show on hover */
 .side-head { display: flex; align-items: center; gap: 6px; } .side-head .brand { flex: 1; min-width: 0; }
 .side-mini svg { transition: transform var(--dur, 150ms); }
-:root.nav-mini { --side: 72px; }
-:root.nav-mini .side { padding: 14px 10px; align-items: center; }
+:root.nav-mini { --side: 64px; }
+:root.nav-mini .side { padding: 14px 8px; align-items: center; }
 :root.nav-mini .side-head { flex-direction: column; }
 :root.nav-mini .brand > span:not(.logo), :root.nav-mini #nav .group, :root.nav-mini #nav kbd, :root.nav-mini .side-foot { display: none; }
 :root.nav-mini .side-mini svg { transform: rotate(180deg); }
